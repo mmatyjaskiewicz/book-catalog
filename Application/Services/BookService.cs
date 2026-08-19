@@ -1,13 +1,14 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs.Requests;
+using Application.Interfaces;
 using Domain.Entities;
 
 namespace Application.Services;
 
 public class BookService(IBookRepository bookRepository)
 {
-    public async Task<Book> CreateAsync(string title, string author, int year)
+    public async Task<Book> CreateAsync(CreateBookRequest request)
     {
-        var book = new Book(title, author, year);
+        var book = new Book(request.Title, request.Author, request.Year);
 
         await bookRepository.AddAsync(book);
         return book;
