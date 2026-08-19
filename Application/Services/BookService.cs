@@ -9,7 +9,7 @@ public class BookService(IBookRepository bookRepository)
     public async Task<Book> CreateAsync(CreateBookRequest request)
     {
         var book = new Book(request.Title, request.Author, request.Year);
-
+        
         await bookRepository.AddAsync(book);
         return book;
     }
