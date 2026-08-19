@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Requests;
+using Application.Exceptions.NotFound;
 using Application.Interfaces;
 using Domain.Entities;
 
@@ -21,11 +22,25 @@ public class BookService(IBookRepository bookRepository)
     
     public async Task<Book?> GetByIdAsync(Guid id)
     {
-        return await bookRepository.GetByIdAsync(id);
+        var book = await bookRepository.GetByIdAsync(id);
+        
+        if (book == null)
+        {
+            throw new NotFoundException("Book not found.");
+        }
+        
+        return book;
     }
     
     public async Task DeleteAsync(Guid id)
     {
-        await bookRepository.DeleteAsync(id);
+        var book = await bookRepository.GetByIdAsync(id);
+        
+        if (book == null)
+        {
+            throw new NotFoundException("Book not found.");
+        }
+        
+        await bookRepository.DeleteAsync(book);
     }
 }
