@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Requests;
+using Application.Exceptions.BadRequest;
 using Application.Exceptions.NotFound;
 using Application.Interfaces;
 using Domain.Entities;
@@ -42,5 +43,38 @@ public class BookService(IBookRepository bookRepository)
         }
         
         await bookRepository.DeleteAsync(book);
+    }
+    
+    public async Task<Book> UpdateAsync(Guid id, UpdateBookRequest request)
+    {
+        if(request.Title == null && request.Author == null && request.Year == null)
+        {
+            throw new BadRequestException("At least one field must be provided.");
+        }
+        
+        var book = await bookRepository.GetByIdAsync(id);
+        
+        if (book == null)
+        {
+            throw new NotFoundException("Book not found.");
+        }
+        
+        if(request.Title != null)
+        {
+            book.UpdateTitle(request.Title);
+        }
+        
+        if(request.Author != null)
+        {
+            book.UpdateAuthor(request.Author);
+        }
+        
+        if(request.Year != null)
+        {
+            book.UpdateYear(request.Year.Value);
+        }
+        
+        await bookRepository.UpdateAsync(book);
+        return book;
     }
 }

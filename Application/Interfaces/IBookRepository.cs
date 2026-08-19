@@ -8,4 +8,5 @@ public interface IBookRepository
     public Task<List<Book>> GetAllAsync();
     public Task<Book?> GetByIdAsync(Guid id);
     public Task DeleteAsync(Book book);
+    public Task UpdateAsync(Book book);
 }
