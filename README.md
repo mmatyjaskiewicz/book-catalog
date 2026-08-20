@@ -1,27 +1,31 @@
-# Book Catalog
+# Book Catalog API
 
-A REST API for managing a book catalog, built with ASP.NET Core.
+REST API for managing a book catalog, built with ASP.NET Core.
 
-## Overview
+## Features
 
-The application provides an API for creating, retrieving, updating, and
-deleting books.
+- Create, read, update and delete books
+- Request validation with FluentValidation
+- Global exception handling
+- Swagger / OpenAPI
+- In-memory data storage
 
-The project is developed as part of a .NET internship and will be extended
-throughout the internship according to the weekly requirements.
+## Structure
 
-## Current Status
+The project is divided into:
 
-Initial project setup.
+- **Domain** – entities and domain rules
+- **Application** – business logic, DTOs and abstractions
+- **Infrastructure** – repository implementation
+- **WebApi** – controllers and API configuration
 
-## Planned Features
+## Documentation
 
-- Create a book
-- Get all books
-- Get a book by ID
-- Update a book
-- Delete a book
-- Input validation
-- Consistent API responses
-- Logging
-- Swagger / OpenAPI documentation
+More details can be found in:
+
+- [`DESIGN_NOTE.md`](DESIGN_NOTE.md) – development notes and design decisions
+- [`MERGE_REQUEST_HISTORY.md`](MERGE_REQUEST_HISTORY.md) – initial GitLab Merge Request history
+
+## Project History
+
+The project was initially developed on GitLab and later migrated to GitHub. Further development continues on GitHub.
