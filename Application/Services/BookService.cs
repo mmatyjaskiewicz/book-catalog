@@ -3,16 +3,19 @@ using Application.Exceptions.BadRequest;
 using Application.Exceptions.NotFound;
 using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class BookService(IBookRepository bookRepository)
+public class BookService(IBookRepository bookRepository, ILogger<BookService> logger)
 {
     public async Task<Book> CreateAsync(CreateBookRequest request)
     {
         var book = new Book(request.Title, request.Author, request.Year);
         
         await bookRepository.AddAsync(book);
+        logger.LogInformation("Book {BookId} was created.", book.Id);
+        
         return book;
     }
     
@@ -27,6 +30,7 @@ public class BookService(IBookRepository bookRepository)
         
         if (book == null)
         {
+            logger.LogWarning("Book {BookId} was not found.", id);
             throw new NotFoundException("Book not found.");
         }
         
@@ -39,10 +43,12 @@ public class BookService(IBookRepository bookRepository)
         
         if (book == null)
         {
+            logger.LogWarning("Book {BookId} was not found.", id);
             throw new NotFoundException("Book not found.");
         }
         
         await bookRepository.DeleteAsync(book);
+        logger.LogInformation("Book {BookId} was deleted.", id);
     }
     
     public async Task<Book> UpdateAsync(Guid id, UpdateBookRequest request)
@@ -56,6 +62,7 @@ public class BookService(IBookRepository bookRepository)
         
         if (book == null)
         {
+            logger.LogWarning("Book {BookId} was not found.", id);
             throw new NotFoundException("Book not found.");
         }
         
@@ -75,6 +82,8 @@ public class BookService(IBookRepository bookRepository)
         }
         
         await bookRepository.UpdateAsync(book);
+        logger.LogInformation("Book {BookId} was updated.", id);
+        
         return book;
     }
 }

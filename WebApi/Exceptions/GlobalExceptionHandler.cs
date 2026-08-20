@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace WebApi.Exceptions;
 
-public class GlobalExceptionHandler : IExceptionHandler
+public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        logger.LogError(exception, "An unhandled exception occurred while processing the request.");
+        
         var title = exception switch
         {
             BadRequestException => "Bad Request",
