@@ -9,10 +9,11 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         
         builder.Services.AddApplicationModules(); 
-        
+        builder.Services.AddControllers();
         builder.Services.AddAuthorization();
         builder.Services.AddOpenApi();
-
+        builder.Services.AddSwaggerGen();
+        
         var app = builder.Build();
         
         if (app.Environment.IsDevelopment())
@@ -23,6 +24,11 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
+        
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        
+        app.MapControllers();
         
         app.Run();
     }

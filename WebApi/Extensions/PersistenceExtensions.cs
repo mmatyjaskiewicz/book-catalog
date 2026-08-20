@@ -7,7 +7,7 @@ public static class PersistenceExtensions
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services)
     {
-        services.AddScoped<IBookRepository, FakeBookRepository>();
+        services.AddSingleton<IBookRepository, FakeBookRepository>();
 
         return services;
     }
