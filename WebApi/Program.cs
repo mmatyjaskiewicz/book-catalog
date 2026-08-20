@@ -15,6 +15,7 @@ public class Program
         builder.Services.AddOpenApi();
         builder.Services.AddSwaggerGen();
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+        builder.Services.AddProblemDetails();
         
         var app = builder.Build();
         
