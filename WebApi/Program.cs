@@ -1,3 +1,4 @@
+using WebApi.Exceptions;
 using WebApi.Extensions;
 
 namespace WebApi;
@@ -13,6 +14,7 @@ public class Program
         builder.Services.AddAuthorization();
         builder.Services.AddOpenApi();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         
         var app = builder.Build();
         
@@ -20,7 +22,9 @@ public class Program
         {
             app.MapOpenApi();
         }
-
+        
+        app.UseExceptionHandler();
+        
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
