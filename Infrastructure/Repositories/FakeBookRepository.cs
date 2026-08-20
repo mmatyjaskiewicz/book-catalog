@@ -1,15 +1,17 @@
 ﻿using Application.Interfaces;
 using Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Repositories;
 
-public class FakeBookRepository : IBookRepository
+public class FakeBookRepository(ILogger<FakeBookRepository> logger) : IBookRepository
 {
     private readonly List<Book> _books = new();
     
     public Task AddAsync(Book book)
     {
         _books.Add(book);
+        logger.LogInformation("Book {BookId} was added to the repository.", book.Id);
         return Task.CompletedTask;
     }
     
