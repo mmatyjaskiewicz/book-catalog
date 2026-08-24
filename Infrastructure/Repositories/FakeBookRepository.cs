@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs.Queries;
+using Application.Interfaces;
+using Application.Models;
 using Domain.Entities;
 
 namespace Infrastructure.Repositories;
@@ -13,9 +15,22 @@ public class FakeBookRepository : IBookRepository
         return Task.CompletedTask;
     }
     
-    public Task<List<Book>> GetAllAsync()
+    public Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
-        return Task.FromResult(_books);
+        var totalCount = _books.Count;
+
+        var pagedBooks = _books
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
+            .Take(queryParameters.PageSize)
+            .ToList();
+
+        var result = new PagedResult<Book>
+        {
+            Items = pagedBooks,
+            TotalCount = totalCount
+        };
+
+        return Task.FromResult(result);
     }
     
     public Task<Book?> GetByIdAsync(Guid id)
