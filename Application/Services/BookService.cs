@@ -1,7 +1,9 @@
-﻿using Application.DTOs.Requests;
+﻿using Application.DTOs.Queries;
+using Application.DTOs.Requests;
 using Application.Exceptions.BadRequest;
 using Application.Exceptions.NotFound;
 using Application.Interfaces;
+using Application.Models;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -19,9 +21,9 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
         return book;
     }
     
-    public async Task<List<Book>> GetAllAsync()
+    public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
-        return await bookRepository.GetAllAsync();
+        return await bookRepository.GetAllAsync(queryParameters);
     }
     
     public async Task<Book?> GetByIdAsync(Guid id)
