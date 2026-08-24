@@ -23,7 +23,23 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
     
     public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
-        return await bookRepository.GetAllAsync(queryParameters);
+        var result = await bookRepository.GetAllAsync(queryParameters);
+        
+        if (result.Items.Count == 0)
+        {
+            logger.LogWarning("No books were found.");
+            throw new NotFoundException("No books found.");
+        }
+        
+        var totalPages = (int)Math.Ceiling((double)result.TotalCount / queryParameters.PageSize);
+        
+        if(queryParameters.PageNumber > totalPages)
+        {
+            logger.LogWarning("Page {PageNumber} is out of range. Total pages: {TotalPages}.", queryParameters.PageNumber, totalPages);
+            throw new BadRequestException($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
+        }
+        
+        return result;
     }
     
     public async Task<Book?> GetByIdAsync(Guid id)
