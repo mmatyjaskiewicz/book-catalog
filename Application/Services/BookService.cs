@@ -1,7 +1,9 @@
-﻿using Application.DTOs.Requests;
+﻿using Application.DTOs.Queries;
+using Application.DTOs.Requests;
 using Application.Exceptions.BadRequest;
 using Application.Exceptions.NotFound;
 using Application.Interfaces;
+using Application.Models;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -19,9 +21,25 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
         return book;
     }
     
-    public async Task<List<Book>> GetAllAsync()
+    public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
-        return await bookRepository.GetAllAsync();
+        var result = await bookRepository.GetAllAsync(queryParameters);
+        
+        if (result.Items.Count == 0)
+        {
+            logger.LogWarning("No books were found.");
+            throw new NotFoundException("No books found.");
+        }
+        
+        var totalPages = (int)Math.Ceiling((double)result.TotalCount / queryParameters.PageSize);
+        
+        if(queryParameters.PageNumber > totalPages)
+        {
+            logger.LogWarning("Page {PageNumber} is out of range. Total pages: {TotalPages}.", queryParameters.PageNumber, totalPages);
+            throw new BadRequestException($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
+        }
+        
+        return result;
     }
     
     public async Task<Book?> GetByIdAsync(Guid id)
