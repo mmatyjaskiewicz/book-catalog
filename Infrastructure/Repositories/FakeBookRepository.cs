@@ -17,9 +17,26 @@ public class FakeBookRepository : IBookRepository
     
     public Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
-        var totalCount = _books.Count;
+        var filteredBooks = _books.AsEnumerable();
+        
+        if (!string.IsNullOrWhiteSpace(queryParameters.Title))
+        {
+            filteredBooks = filteredBooks.Where(b => b.Title.Contains(queryParameters.Title, StringComparison.OrdinalIgnoreCase));
+        }
+        
+        if (!string.IsNullOrWhiteSpace(queryParameters.Author))
+        {
+            filteredBooks = filteredBooks.Where(b => b.Author.Contains(queryParameters.Author, StringComparison.OrdinalIgnoreCase));
+        }
+        
+        if (queryParameters.Year.HasValue)
+        {
+            filteredBooks = filteredBooks.Where(b => b.Year == queryParameters.Year.Value);
+        }
+        
+        var totalCount = filteredBooks.Count();
 
-        var pagedBooks = _books
+        var pagedBooks = filteredBooks
             .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
             .Take(queryParameters.PageSize)
             .ToList();
