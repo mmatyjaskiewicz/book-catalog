@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Requests;
+﻿using Application.DTOs.Queries;
+using Application.DTOs.Requests;
 using Application.Interfaces;
 using Application.Services;
 using Domain.Entities;
@@ -12,9 +13,9 @@ public class BookController(BookService bookService) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] BookQueryParameters queryParameters)
     {
-        var books = await bookService.GetAllAsync();
+        var books = await bookService.GetAllAsync(queryParameters);
         return Ok(books);
     }
 
