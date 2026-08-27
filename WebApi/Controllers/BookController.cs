@@ -1,8 +1,6 @@
 ﻿using Application.DTOs.Queries;
 using Application.DTOs.Requests;
-using Application.Interfaces;
 using Application.Services;
-using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
