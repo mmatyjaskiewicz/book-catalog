@@ -35,3 +35,41 @@ The project was initially developed and maintained on GitLab during the first we
 After completing the initial development stage, the project was migrated to GitHub for backup and continuity purposes. Further development will continue on GitHub from this point forward.
 
 The original GitLab repository will remain as a reference for the initial development history.
+
+# Week 2
+
+## What I built
+
+Extended the REST API with pagination and filtering for the book list endpoint.
+
+The endpoint now supports filtering books by title, author and year, as well as pagination with configurable page numbers and page sizes.
+
+I also added validation for pagination parameters and handling for cases where the requested page is outside the available range.
+
+I introduced unit testing with xUnit and Moq, covering the main `BookService` operations and FluentValidation validators, including successful operations and expected exceptions.
+
+## Key decisions
+
+I kept filtering and pagination inside the repository layer so that the `BookService` can focus on application-level logic and validation.
+
+For title and author filtering, I used case-insensitive partial matching, while year filtering requires an exact match.
+
+For pagination, the repository returns both the requested items and the total number of matching books, allowing the service to validate the requested page and provide pagination information to the client.
+
+For unit tests, I used mocks to isolate `BookService` from its repository and logging dependencies. This allows the service logic to be tested without relying on the actual repository implementation.
+
+I also separated validator tests from service tests, since validators can be tested independently without external dependencies.
+
+## What was difficult
+
+The most important learning area during this week was unit testing. I had limited experience with xUnit and Moq, so I needed to improve my understanding of how unit tests are structured and used.
+
+Another useful discovery came from testing the PATCH functionality. The tests helped identify that the update validator was treating a partial update as if all fields were required.
+
+I adjusted the validation rules so that fields are validated only when they are provided, while the service still prevents an empty PATCH request.
+
+## Additional Notes
+
+The changes from this week were developed through separate feature branches and merged into `development` before being promoted to `main`.
+
+The project now has initial unit test coverage for the application service and validators, providing a foundation for adding more tests as the project grows.
