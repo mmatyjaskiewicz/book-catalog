@@ -6,9 +6,11 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        DotNetEnv.Env.TraversePath().Load();
+        
         var builder = WebApplication.CreateBuilder(args);
         
-        builder.Services.AddApplicationModules();
+        builder.Services.AddApplicationModules(builder.Configuration);
         
         var app = builder.Build();
         

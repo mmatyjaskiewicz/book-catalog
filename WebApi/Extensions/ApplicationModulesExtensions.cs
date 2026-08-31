@@ -2,10 +2,10 @@
 
 public static class ApplicationModulesExtensions
 {
-    public static IServiceCollection AddApplicationModules(this IServiceCollection services)
+    public static IServiceCollection AddApplicationModules(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddControllersConfiguration();
-        services.AddPersistence();
+        services.AddPersistence(configuration);
         services.AddServices();
         services.AddValidation();
         services.AddExceptionHandling();
