@@ -11,10 +11,9 @@ public static class PersistenceExtensions
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
         
-        services.AddDbContext<BookCatalogDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        services.AddDbContext<BookCatalogDbContext>(options => options.UseNpgsql(connectionString));
         
-        services.AddSingleton<IBookRepository, FakeBookRepository>();
+        services.AddScoped<IBookRepository, EfBookRepository>();
 
         return services;
     }
