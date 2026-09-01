@@ -15,7 +15,7 @@ public static class PersistenceExtensions
         
         services.AddScoped<IBookRepository, EfBookRepository>();
         
-        // services.AddSingleton<IBookRepository, FakeBookRepository>();
+        services.AddScoped<IAuthorRepository, EfAuthorRepository>();
 
         return services;
     }
