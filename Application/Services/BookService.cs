@@ -89,7 +89,10 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
             book.UpdateTitle(request.Title);
         }
         
-        // TODO: Create author update
+        if (request.AuthorId.HasValue)
+        {
+            book.UpdateAuthorId(request.AuthorId.Value);
+        }
         
         if(request.PublishYear != null)
         {

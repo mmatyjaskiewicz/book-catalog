@@ -32,6 +32,12 @@ public class Book : EntityBase
         PublishYear = publishYear;
     }
     
+    public void UpdateAuthorId(Guid authorId)
+    {
+        ValidateAuthorId(authorId);
+        AuthorId = authorId;
+    }
+    
     private static void ValidateTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
@@ -45,5 +51,11 @@ public class Book : EntityBase
     {
         if (publishYear < 1 || publishYear > DateTime.UtcNow.Year)
             throw new DomainException("Invalid publication year.");
+    }
+    
+    public static void ValidateAuthorId(Guid authorId)
+    {
+        if (authorId == Guid.Empty)
+            throw new DomainException("AuthorId is required.");
     }
 }
