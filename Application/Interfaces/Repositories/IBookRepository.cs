@@ -2,7 +2,7 @@
 using Application.Models;
 using Domain.Entities;
 
-namespace Application.Interfaces;
+namespace Application.Interfaces.Repositories;
 
 public interface IBookRepository : IRepository<Book>
 {

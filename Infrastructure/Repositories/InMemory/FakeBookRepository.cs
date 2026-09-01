@@ -1,9 +1,10 @@
 ﻿using Application.DTOs.Queries;
 using Application.Interfaces;
+using Application.Interfaces.Repositories;
 using Application.Models;
 using Domain.Entities;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.InMemory;
 
 public class FakeBookRepository : IBookRepository
 {

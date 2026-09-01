@@ -1,40 +1,24 @@
 ﻿using Application.DTOs.Queries;
-using Application.Interfaces;
+using Application.Interfaces.Repositories;
 using Application.Models;
 using Domain.Entities;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.EntityFramework;
 
-public class EfBookRepository(BookCatalogDbContext context) : IBookRepository
-{
-    public Task AddAsync(Book book)
+public class EfBookRepository : EfRepository<Book>, IBookRepository
+{ 
+    private readonly BookCatalogDbContext _context;
+
+    public EfBookRepository(BookCatalogDbContext context) : base(context)
     {
-        context.Books.Add(book);
-        return context.SaveChangesAsync();
-    }
-    
-    public Task UpdateAsync(Book book)
-    {
-        context.Books.Update(book);
-        return context.SaveChangesAsync();
-    }
-    
-    public Task DeleteAsync(Book book)
-    {
-        context.Books.Remove(book);
-        return context.SaveChangesAsync();
-    }
-    
-    public Task<Book?> GetByIdAsync(Guid id)
-    {
-        return context.Books.FirstOrDefaultAsync(b => b.Id == id);
+        _context = context;
     }
     
     public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
-        var query = context.Books.AsQueryable();
+        var query = _context.Books.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(queryParameters.Title))
         {
