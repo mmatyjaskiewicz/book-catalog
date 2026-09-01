@@ -6,6 +6,6 @@ public class BookQueryParameters
     public int PageSize { get; set; } = 10;
     
     public string? Title { get; set; } = string.Empty;
-    public string? Author { get; set; } = string.Empty;
-    public int? Year { get; set; } = null;
+    public Guid? AuthorId { get; set; }
+    public int? PublishYear { get; set; } = null;
 }
