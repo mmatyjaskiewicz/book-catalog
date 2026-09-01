@@ -11,7 +11,10 @@ public class UpdateBookRequestValidator : AbstractValidator<UpdateBookRequest>
             .NotEmpty().WithMessage("Title is required.").When(x => x.Title != null)
             .MaximumLength(100).WithMessage("Title must not exceed 100 characters.");
         
-        // TODO: Check if author validation is required
+        RuleFor(x => x.AuthorId)
+            .NotEmpty().WithMessage("AuthorId cannot be empty.")
+            .When(x => x.AuthorId.HasValue);
+
 
         RuleFor(x => x.PublishYear)
             .NotEmpty().WithMessage("Year is required.").When(x => x.PublishYear != null)
