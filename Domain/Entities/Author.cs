@@ -10,4 +10,6 @@ public class Author : EntityBase
     {
         Name = name;
     }
+    
+    // TODO: Add author update method
 }

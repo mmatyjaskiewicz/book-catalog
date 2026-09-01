@@ -23,15 +23,12 @@ public class EfBookRepository(BookCatalogDbContext context) : IBookRepository
         {
             query = query.Where(b => b.Title.Contains(queryParameters.Title));
         }
-
-        if (!string.IsNullOrWhiteSpace(queryParameters.Author))
-        {
-            query = query.Where(b => b.Author.Contains(queryParameters.Author));
-        }
+        
+        // TODO: Implement author filtering
 
         if (queryParameters.Year.HasValue)
         {
-            query = query.Where(b => b.Year == queryParameters.Year.Value);
+            query = query.Where(b => b.PublishYear == queryParameters.Year.Value);
         }
 
         var totalCount = await query.CountAsync();
