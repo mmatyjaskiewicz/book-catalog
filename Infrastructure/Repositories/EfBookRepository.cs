@@ -15,6 +15,23 @@ public class EfBookRepository(BookCatalogDbContext context) : IBookRepository
         return context.SaveChangesAsync();
     }
     
+    public Task UpdateAsync(Book book)
+    {
+        context.Books.Update(book);
+        return context.SaveChangesAsync();
+    }
+    
+    public Task DeleteAsync(Book book)
+    {
+        context.Books.Remove(book);
+        return context.SaveChangesAsync();
+    }
+    
+    public Task<Book?> GetByIdAsync(Guid id)
+    {
+        return context.Books.FirstOrDefaultAsync(b => b.Id == id);
+    }
+    
     public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
         var query = context.Books.AsQueryable();
@@ -46,22 +63,5 @@ public class EfBookRepository(BookCatalogDbContext context) : IBookRepository
             Items = pagedBooks,
             TotalCount = totalCount
         };
-    }
-    
-    public Task<Book?> GetByIdAsync(Guid id)
-    {
-        return context.Books.FirstOrDefaultAsync(b => b.Id == id);
-    }
-    
-    public Task DeleteAsync(Book book)
-    {
-        context.Books.Remove(book);
-        return context.SaveChangesAsync();
-    }
-    
-    public Task UpdateAsync(Book book)
-    {
-        context.Books.Update(book);
-        return context.SaveChangesAsync();
     }
 }

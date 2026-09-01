@@ -15,6 +15,23 @@ public class FakeBookRepository : IBookRepository
         return Task.CompletedTask;
     }
     
+    public Task UpdateAsync(Book book)
+    {
+        return Task.CompletedTask;
+    }
+    
+    public Task DeleteAsync(Book book)
+    {
+        _books.Remove(book);
+        return Task.CompletedTask;
+    }
+    
+    public Task<Book?> GetByIdAsync(Guid id)
+    {
+        var book = _books.FirstOrDefault(b => b.Id == id);
+        return Task.FromResult(book);
+    }
+    
     public Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
         var filteredBooks = _books.AsEnumerable();
@@ -48,22 +65,5 @@ public class FakeBookRepository : IBookRepository
         };
 
         return Task.FromResult(result);
-    }
-    
-    public Task<Book?> GetByIdAsync(Guid id)
-    {
-        var book = _books.FirstOrDefault(b => b.Id == id);
-        return Task.FromResult(book);
-    }
-    
-    public Task DeleteAsync(Book book)
-    {
-        _books.Remove(book);
-        return Task.CompletedTask;
-    }
-    
-    public Task UpdateAsync(Book book)
-    {
-        return Task.CompletedTask;
     }
 }
