@@ -2,22 +2,22 @@
 
 namespace Domain.Entities;
 
-public class Book
-{
-    public Guid Id { get; private set; } = Guid.NewGuid();
+public class Book : EntityBase
+{ 
     public string Title { get; private set; }
-    public string Author { get; private set; }
-    public int Year { get; private set; }
+    public int PublishYear { get; private set; }
     
-    public Book(string title, string author, int year)
+    public Guid AuthorId { get; private set; }
+    public Author Author { get; set; }
+    
+    public Book(string title, Guid authorId, int publishYear)
     {
         ValidateTitle(title);
-        ValidateAuthor(author);
-        ValidateYear(year);
-        
+        ValidatePublishYear(publishYear);
+
         Title = title;
-        Author = author;
-        Year = year;
+        AuthorId = authorId;
+        PublishYear = publishYear;
     }
     
     public void UpdateTitle(string title)
@@ -26,16 +26,10 @@ public class Book
         Title = title;
     }
     
-    public void UpdateAuthor(string author)
-    { 
-        ValidateAuthor(author);
-        Author = author;
-    }
-    
-    public void UpdateYear(int year)
+    public void UpdatePublishYear(int publishYear)
     {
-        ValidateYear(year);
-        Year = year;
+        ValidatePublishYear(publishYear);
+        PublishYear = publishYear;
     }
     
     private static void ValidateTitle(string title)
@@ -47,18 +41,9 @@ public class Book
             throw new DomainException("Title cannot exceed 200 characters.");
     }
     
-    private static void ValidateAuthor(string author)
+    private static void ValidatePublishYear(int publishYear)
     {
-        if (string.IsNullOrWhiteSpace(author))
-            throw new DomainException("Author is required.");
-
-        if (author.Length > 200)
-            throw new DomainException("Author cannot exceed 200 characters.");
-    }
-    
-    private static void ValidateYear(int year)
-    {
-        if (year < 1 || year > DateTime.UtcNow.Year)
+        if (publishYear < 1 || publishYear > DateTime.UtcNow.Year)
             throw new DomainException("Invalid publication year.");
     }
 }
