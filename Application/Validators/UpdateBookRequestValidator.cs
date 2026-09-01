@@ -12,7 +12,8 @@ public class UpdateBookRequestValidator : AbstractValidator<UpdateBookRequest>
             .MaximumLength(100).WithMessage("Title must not exceed 100 characters.");
         
         RuleFor(x => x.AuthorId)
-            .NotEmpty().WithMessage("AuthorId cannot be empty.")
+            .Must(authorId => authorId != Guid.Empty)
+            .WithMessage("AuthorId cannot be empty.")
             .When(x => x.AuthorId.HasValue);
 
 

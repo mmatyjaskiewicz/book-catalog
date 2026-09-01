@@ -15,8 +15,8 @@ public class UpdateBookRequestValidatorTests
         var request = new UpdateBookRequest
         {
             Title = "Mock title",
-            Author = "Mock author",
-            Year = 2024
+            AuthorId = Guid.NewGuid(),
+            PublishYear = 2024
         };
 
         // Act
@@ -35,8 +35,8 @@ public class UpdateBookRequestValidatorTests
         var request = new UpdateBookRequest
         {
             Title = new string('A', 101),
-            Author = "Mock author",
-            Year = 2024
+            AuthorId = Guid.NewGuid(),
+            PublishYear = 2024
         };
 
         // Act
@@ -47,7 +47,7 @@ public class UpdateBookRequestValidatorTests
     }
     
     [Fact]
-    public void ShouldHaveError_WhenAuthorIsTooLong()
+    public void ShouldHaveError_WhenAuthorIdIsEmpty()
     {
         // Arrange
         var validator = new UpdateBookRequestValidator();
@@ -55,15 +55,15 @@ public class UpdateBookRequestValidatorTests
         var request = new UpdateBookRequest
         {
             Title = "Mock title",
-            Author = new string('A', 101),
-            Year = 2024
+            AuthorId = Guid.Empty,
+            PublishYear = 2024
         };
 
         // Act
         var result = validator.TestValidate(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Author);
+        result.ShouldHaveValidationErrorFor(x => x.AuthorId);
     }
     
     [Fact]
@@ -75,15 +75,15 @@ public class UpdateBookRequestValidatorTests
         var request = new UpdateBookRequest
         {
             Title = "Mock title",
-            Author = "Mock author",
-            Year = -1
+            AuthorId = Guid.NewGuid(),
+            PublishYear = -1
         };
 
         // Act
         var result = validator.TestValidate(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Year);
+        result.ShouldHaveValidationErrorFor(x => x.PublishYear);
     }
 
     [Fact]
@@ -95,14 +95,14 @@ public class UpdateBookRequestValidatorTests
         var request = new UpdateBookRequest
         {
             Title = "Mock title",
-            Author = "Mock author",
-            Year = DateTime.Now.Year + 1
+            AuthorId = Guid.NewGuid(),
+            PublishYear = DateTime.Now.Year + 1
         };
 
         // Act
         var result = validator.TestValidate(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(x => x.Year);
+        result.ShouldHaveValidationErrorFor(x => x.PublishYear);
     }
 }
