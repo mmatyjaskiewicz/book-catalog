@@ -15,8 +15,8 @@ public class CreateBookRequestValidatorTests
         var request = new CreateBookRequest
         {
             Title = "Mock title",
-            Author = "Mock author",
-            Year = 2024
+            AuthorId = Guid.NewGuid(),
+            PublishYear = 2024
         };
 
         // Act
@@ -35,8 +35,8 @@ public class CreateBookRequestValidatorTests
         var request = new CreateBookRequest
         {
             Title = "",
-            Author = "Mock author",
-            Year = 2024
+            AuthorId = Guid.NewGuid(),
+            PublishYear = 2024
         };
 
         // Act

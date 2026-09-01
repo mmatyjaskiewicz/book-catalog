@@ -24,11 +24,14 @@ public class EfBookRepository(BookCatalogDbContext context) : IBookRepository
             query = query.Where(b => b.Title.Contains(queryParameters.Title));
         }
         
-        // TODO: Implement author filtering
-
-        if (queryParameters.Year.HasValue)
+        if (queryParameters.AuthorId.HasValue)
         {
-            query = query.Where(b => b.PublishYear == queryParameters.Year.Value);
+            query = query.Where(b => b.AuthorId == queryParameters.AuthorId.Value);
+        }
+
+        if (queryParameters.PublishYear.HasValue)
+        {
+            query = query.Where(b => b.PublishYear == queryParameters.PublishYear.Value);
         }
 
         var totalCount = await query.CountAsync();
