@@ -10,12 +10,10 @@ public class CreateBookRequestValidator : AbstractValidator<CreateBookRequest>
         RuleFor(x => x.Title)
             .NotEmpty().WithMessage("Title is required.")
             .MaximumLength(100).WithMessage("Title must not exceed 100 characters.");
-
-        RuleFor(x => x.Author)
-            .NotEmpty().WithMessage("Author is required.")
-            .MaximumLength(100).WithMessage("Author must not exceed 100 characters.");
         
-        RuleFor(x => x.Year).
+        // TODO: Check if author validation is required
+        
+        RuleFor(x => x.PublishYear).
             InclusiveBetween(1, DateTime.Now.Year).WithMessage($"Year must be between 1 and {DateTime.Now.Year}.");
     }
 }

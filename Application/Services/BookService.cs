@@ -13,7 +13,7 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
 {
     public async Task<Book> CreateAsync(CreateBookRequest request)
     {
-        var book = new Book(request.Title, request.Author, request.Year);
+        var book = new Book(request.Title, request.AuthorId, request.PublishYear);
         
         await bookRepository.AddAsync(book);
         logger.LogInformation("Book {BookId} was created.", book.Id);
@@ -71,7 +71,7 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
     
     public async Task<Book> UpdateAsync(Guid id, UpdateBookRequest request)
     {
-        if(request.Title == null && request.Author == null && request.Year == null)
+        if(request.Title == null && request.AuthorId == null && request.PublishYear == null)
         {
             throw new BadRequestException("At least one field must be provided.");
         }
@@ -89,14 +89,11 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
             book.UpdateTitle(request.Title);
         }
         
-        if(request.Author != null)
-        {
-            book.UpdateAuthor(request.Author);
-        }
+        // TODO: Create author update
         
-        if(request.Year != null)
+        if(request.PublishYear != null)
         {
-            book.UpdateYear(request.Year.Value);
+            book.UpdatePublishYear(request.PublishYear.Value);
         }
         
         await bookRepository.UpdateAsync(book);

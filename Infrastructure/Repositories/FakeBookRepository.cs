@@ -24,14 +24,11 @@ public class FakeBookRepository : IBookRepository
             filteredBooks = filteredBooks.Where(b => b.Title.Contains(queryParameters.Title, StringComparison.OrdinalIgnoreCase));
         }
         
-        if (!string.IsNullOrWhiteSpace(queryParameters.Author))
-        {
-            filteredBooks = filteredBooks.Where(b => b.Author.Contains(queryParameters.Author, StringComparison.OrdinalIgnoreCase));
-        }
+        // TODO: Implement author filtering
         
         if (queryParameters.Year.HasValue)
         {
-            filteredBooks = filteredBooks.Where(b => b.Year == queryParameters.Year.Value);
+            filteredBooks = filteredBooks.Where(b => b.PublishYear == queryParameters.Year.Value);
         }
         
         var totalCount = filteredBooks.Count();
