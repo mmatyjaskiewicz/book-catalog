@@ -2,7 +2,7 @@
 using Application.DTOs.Requests;
 using Application.Exceptions.BadRequest;
 using Application.Exceptions.NotFound;
-using Application.Interfaces;
+using Application.Interfaces.Repositories;
 using Application.Models;
 using Application.Services;
 using Domain.Entities;

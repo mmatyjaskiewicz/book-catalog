@@ -1,6 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Interfaces.Repositories;
 using Infrastructure.Persistence;
-using Infrastructure.Repositories;
+using Infrastructure.Repositories.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 
 namespace WebApi.Extensions;
