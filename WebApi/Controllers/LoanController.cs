@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Requests;
+﻿using Application.DTOs.Queries;
+using Application.DTOs.Requests;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,5 +23,19 @@ public class LoanController(LoanService loanService) : ControllerBase
         await loanService.ReturnAsync(loanId);
         
         return NoContent();
+    }
+    
+    [HttpGet("{loanId:guid}")]
+    public async Task<ActionResult> GetById(Guid loanId)
+    {
+        var loan = await loanService.GetByIdAsync(loanId);
+        return Ok(loan);
+    }
+
+    [HttpGet]
+    public async Task<ActionResult> GetAll([FromQuery] LoanQueryParameters queryParameters)
+    {
+        var loans = await loanService.GetAllAsync(queryParameters);
+        return Ok(loans);
     }
 }

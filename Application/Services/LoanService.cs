@@ -1,5 +1,8 @@
 ﻿using Application.DTOs.Queries;
 using Application.DTOs.Requests;
+using Application.Exceptions.BadRequest;
+using Application.Exceptions.Conflict;
+using Application.Exceptions.NotFound;
 using Application.Interfaces.Repositories;
 using Application.Models;
 using Domain.Entities;
@@ -13,19 +16,19 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
         var loan = await loanRepository.GetActiveLoanByBookIdAsync(request.BookId);
         if (loan != null)
         {
-            throw new Exception("Book is already borrowed.");
+            throw new ConflictException("Book is already borrowed.");
         }
         
         var book = await bookRepository.GetByIdAsync(request.BookId);
         if (book == null)
         {
-            throw new Exception("Book not found.");
+            throw new NotFoundException("Book not found.");
         }
         
         var user = await userRepository.GetByIdAsync(request.UserId);
         if (user == null)
         {
-            throw new Exception("User not found.");
+            throw new NotFoundException("User not found.");
         }
         
         var newLoan = new Loan(request.BookId, request.UserId);
@@ -37,12 +40,12 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
         var loan = await loanRepository.GetByIdAsync(loanId);
         if (loan == null)
         {
-            throw new Exception("Loan not found.");
+            throw new NotFoundException("Loan not found.");
         }
         
         if (loan.ReturnedAt != null)
         {
-            throw new Exception("Book has already been returned.");
+            throw new ConflictException("Book has already been returned.");
         }
         
         loan.Return();
@@ -54,7 +57,7 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
         var loan = await loanRepository.GetByIdAsync(loanId);
         if (loan == null)
         {
-            throw new Exception("Loan not found.");
+            throw new NotFoundException("Loan not found.");
         }
         
         return loan;
@@ -66,14 +69,14 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
 
         if (result.Items.Count == 0)
         {
-            throw new Exception("No loans found.");
+            throw new NotFoundException("No loans found.");
         }
 
         var totalPages = (int)Math.Ceiling((double)result.TotalCount / queryParameters.PageSize);
 
         if (queryParameters.PageNumber > totalPages)
         {
-            throw new Exception($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
+            throw new BadRequestException($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
         }
         
         return result;
