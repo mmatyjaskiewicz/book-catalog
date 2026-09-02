@@ -1,5 +1,6 @@
 ﻿using Application.Exceptions;
 using Application.Exceptions.BadRequest;
+using Application.Exceptions.Conflict;
 using Application.Exceptions.NotFound;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -15,6 +16,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         {
             BadRequestException => "Bad Request",
             NotFoundException => "Not Found",
+            ConflictException => "Conflict",
             _ => "Internal Server Error"
         };
         
@@ -22,6 +24,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         {
             BadRequestException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
+            ConflictException => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
         

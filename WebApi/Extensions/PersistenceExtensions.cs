@@ -14,8 +14,9 @@ public static class PersistenceExtensions
         services.AddDbContext<BookCatalogDbContext>(options => options.UseNpgsql(connectionString));
         
         services.AddScoped<IBookRepository, EfBookRepository>();
-        
         services.AddScoped<IAuthorRepository, EfAuthorRepository>();
+        services.AddScoped<ILoanRepository, EfLoanRepository>();
+        services.AddScoped<IUserRepository, EfUserRepository>();
 
         return services;
     }
