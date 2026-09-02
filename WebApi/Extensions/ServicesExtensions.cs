@@ -8,6 +8,7 @@ public static class ServicesExtensions
     {
         services.AddScoped<BookService>();
         services.AddScoped<AuthorService>();
+        services.AddScoped<LoanService>();
         
         return services;
     }

@@ -1,5 +1,7 @@
-﻿using Application.DTOs.Requests;
+﻿using Application.DTOs.Queries;
+using Application.DTOs.Requests;
 using Application.Interfaces.Repositories;
+using Application.Models;
 using Domain.Entities;
 
 namespace Application.Services;
@@ -45,5 +47,35 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
         
         loan.Return();
         await loanRepository.UpdateAsync(loan);
+    }
+    
+    public async Task<Loan> GetByIdAsync(Guid loanId)
+    {
+        var loan = await loanRepository.GetByIdAsync(loanId);
+        if (loan == null)
+        {
+            throw new Exception("Loan not found.");
+        }
+        
+        return loan;
+    }
+
+    public async Task<PagedResult<Loan>> GetAllAsync(LoanQueryParameters queryParameters)
+    {
+        var result = await loanRepository.GetAllAsync(queryParameters);
+
+        if (result.Items.Count == 0)
+        {
+            throw new Exception("No loans found.");
+        }
+
+        var totalPages = (int)Math.Ceiling((double)result.TotalCount / queryParameters.PageSize);
+
+        if (queryParameters.PageNumber > totalPages)
+        {
+            throw new Exception($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
+        }
+        
+        return result;
     }
 }
