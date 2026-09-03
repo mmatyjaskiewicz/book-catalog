@@ -1,4 +1,16 @@
 services:
+    webapi:
+        build:
+            context: .
+            dockerfile: WebApi/Dockerfile
+        container_name: bookcatalog-api
+        ports:
+            - "5001:8080"
+        environment:
+            ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+        depends_on:
+            - postgres
+
     postgres:
         image: postgres:17
         container_name: bookcatalog-postgres
