@@ -1,15 +1,25 @@
-﻿using Application.Interfaces;
+﻿using Application.Exceptions.Conflict;
+using Application.Interfaces;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Infrastructure.Repositories;
 
 public class EfRepository<T>(BookCatalogDbContext context) : IRepository<T> where T : class
 {
-    public Task AddAsync(T entity)
+    public async Task AddAsync(T entity)
     {
         context.Set<T>().Add(entity);
-        return context.SaveChangesAsync();
+        
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: "23505", ConstraintName: "ix_loans_book_id_active" })
+        {
+            throw new ConcurrencyConflictException("Book is already borrowed.");
+        }
     }
 
     public Task UpdateAsync(T entity)
