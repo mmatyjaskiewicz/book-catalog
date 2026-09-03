@@ -11,6 +11,11 @@ public class LoanConfiguration : IEntityTypeConfiguration<Loan>
         builder.ToTable("loans");
 
         builder.HasKey(l => l.Id);
+        
+        builder.HasIndex(l => l.BookId)
+            .HasDatabaseName("ix_loans_book_id_active")
+            .IsUnique()
+            .HasFilter("\"returned_at\" IS NULL");
 
         builder.Property(l => l.Id)
             .HasColumnName("id");
