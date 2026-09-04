@@ -2,7 +2,7 @@
 using Application.DTOs.Requests;
 using Application.Exceptions.BadRequest;
 using Application.Exceptions.NotFound;
-using Application.Interfaces;
+using Application.Interfaces.Repositories;
 using Application.Models;
 using Application.Services;
 using Domain.Entities;
@@ -27,7 +27,7 @@ public class BookServiceTests
             PageSize = 10
         };
 
-        var book = new Book("Mock title", "Mock author", 2024);
+        var book = new Book("Mock title", Guid.NewGuid(), 2024);
 
         var pagedResult = new PagedResult<Book>
         {
@@ -94,7 +94,7 @@ public class BookServiceTests
         {
             Items =
             [
-                new Book("Mock title", "Mock author", 2024)
+                new Book("Mock title", Guid.NewGuid(), 2024)
             ],
             TotalCount = 25
         };
@@ -117,7 +117,7 @@ public class BookServiceTests
         var repositoryMock = new Mock<IBookRepository>();
         var loggerMock = new Mock<ILogger<BookService>>();
         
-        var book = new Book("Mock title", "Mock author", 2024);
+        var book = new Book("Mock title", Guid.NewGuid(), 2024);
         
         repositoryMock
             .Setup(x => x.GetByIdAsync(book.Id))
@@ -164,8 +164,8 @@ public class BookServiceTests
         var request = new CreateBookRequest
         {
             Title = "Mock title",
-            Author = "Mock author",
-            Year = 2024
+            AuthorId = Guid.NewGuid(),
+            PublishYear = 2024
         };
         
         await bookService.CreateAsync(request);
@@ -173,8 +173,8 @@ public class BookServiceTests
         repositoryMock.Verify(
             x => x.AddAsync(It.Is<Book>(book =>
                 book.Title == request.Title &&
-                book.Author == request.Author &&
-                book.Year == request.Year)),
+                book.AuthorId == request.AuthorId &&
+                book.PublishYear == request.PublishYear)),
             Times.Once);
     }
     
@@ -186,7 +186,7 @@ public class BookServiceTests
         var repositoryMock = new Mock<IBookRepository>();
         var loggerMock = new Mock<ILogger<BookService>>();
 
-        var book = new Book("Mock title", "Mock author", 2024);
+        var book = new Book("Mock title", Guid.NewGuid(), 2024);
 
         repositoryMock
             .Setup(x => x.GetByIdAsync(book.Id))
@@ -228,13 +228,14 @@ public class BookServiceTests
         var repositoryMock = new Mock<IBookRepository>();
         var loggerMock = new Mock<ILogger<BookService>>();
 
-        var book = new Book("Old title", "Old author", 2000);
+        var book = new Book("Old title", Guid.NewGuid(), 2000);
+        var authorId = Guid.NewGuid();
 
         var request = new UpdateBookRequest
         {
             Title = "New title",
-            Author = "New author",
-            Year = 2020
+            AuthorId = authorId,
+            PublishYear = 2020
         };
 
         repositoryMock
@@ -248,8 +249,8 @@ public class BookServiceTests
 
         // Assert
         Assert.Equal("New title", result.Title);
-        Assert.Equal("New author", result.Author);
-        Assert.Equal(2020, result.Year);
+        Assert.Equal(authorId, result.AuthorId);
+        Assert.Equal(2020, result.PublishYear);
 
         repositoryMock.Verify(x => x.UpdateAsync(book), Times.Once);
     }
@@ -266,8 +267,8 @@ public class BookServiceTests
         var request = new UpdateBookRequest
         {
             Title = "New title",
-            Author = "New author",
-            Year = 2020
+            AuthorId = Guid.NewGuid(),
+            PublishYear = 2020
         };
 
         repositoryMock

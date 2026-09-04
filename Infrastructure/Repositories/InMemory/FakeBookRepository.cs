@@ -1,9 +1,10 @@
 ﻿using Application.DTOs.Queries;
 using Application.Interfaces;
+using Application.Interfaces.Repositories;
 using Application.Models;
 using Domain.Entities;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.InMemory;
 
 public class FakeBookRepository : IBookRepository
 {
@@ -15,6 +16,23 @@ public class FakeBookRepository : IBookRepository
         return Task.CompletedTask;
     }
     
+    public Task UpdateAsync(Book book)
+    {
+        return Task.CompletedTask;
+    }
+    
+    public Task DeleteAsync(Book book)
+    {
+        _books.Remove(book);
+        return Task.CompletedTask;
+    }
+    
+    public Task<Book?> GetByIdAsync(Guid id)
+    {
+        var book = _books.FirstOrDefault(b => b.Id == id);
+        return Task.FromResult(book);
+    }
+    
     public Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
         var filteredBooks = _books.AsEnumerable();
@@ -24,14 +42,14 @@ public class FakeBookRepository : IBookRepository
             filteredBooks = filteredBooks.Where(b => b.Title.Contains(queryParameters.Title, StringComparison.OrdinalIgnoreCase));
         }
         
-        if (!string.IsNullOrWhiteSpace(queryParameters.Author))
+        if (queryParameters.AuthorId.HasValue)
         {
-            filteredBooks = filteredBooks.Where(b => b.Author.Contains(queryParameters.Author, StringComparison.OrdinalIgnoreCase));
+            filteredBooks = filteredBooks.Where(b => b.AuthorId == queryParameters.AuthorId.Value);
         }
         
-        if (queryParameters.Year.HasValue)
+        if (queryParameters.PublishYear.HasValue)
         {
-            filteredBooks = filteredBooks.Where(b => b.Year == queryParameters.Year.Value);
+            filteredBooks = filteredBooks.Where(b => b.PublishYear == queryParameters.PublishYear.Value);
         }
         
         var totalCount = filteredBooks.Count();
@@ -48,22 +66,5 @@ public class FakeBookRepository : IBookRepository
         };
 
         return Task.FromResult(result);
-    }
-    
-    public Task<Book?> GetByIdAsync(Guid id)
-    {
-        var book = _books.FirstOrDefault(b => b.Id == id);
-        return Task.FromResult(book);
-    }
-    
-    public Task DeleteAsync(Book book)
-    {
-        _books.Remove(book);
-        return Task.CompletedTask;
-    }
-    
-    public Task UpdateAsync(Book book)
-    {
-        return Task.CompletedTask;
     }
 }

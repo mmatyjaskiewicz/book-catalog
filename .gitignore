@@ -43,8 +43,6 @@ packages/
 # ASP.NET CONFIGURATION
 ##################################################
 
-appsettings.Development.json
-appsettings.*.local.json
 secrets.json
 **/secrets.json
 
