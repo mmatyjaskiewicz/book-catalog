@@ -18,10 +18,10 @@ public class EfLoanRepository : EfRepository<Loan>, ILoanRepository
 
     public async Task<Loan?> GetActiveLoanByBookIdAsync(Guid bookId)
     {
-        return await _context.Loans.FirstOrDefaultAsync(l => l.BookId == bookId && l.ReturnedAt == null);
+        return await _context.Loans.FirstOrDefaultAsync(l => l.BookId == bookId);
     }
-    
-    public async Task<PagedResult<Loan>> GetAllAsync(LoanQueryParameters queryParameters)
+
+    public async Task<PagedResult<Loan>> GetActiveLoansAsync(LoanQueryParameters queryParameters)
     {
         var query = _context.Loans.AsQueryable();
 
@@ -35,15 +35,6 @@ public class EfLoanRepository : EfRepository<Loan>, ILoanRepository
             query = query.Where(l => l.BookId == queryParameters.BookId.Value);
         }
 
-        if (queryParameters.ActiveOnly == true)
-        {
-            query = query.Where(l => l.ReturnedAt == null);
-        }
-        else if (queryParameters.ActiveOnly == false)
-        {
-            query = query.Where(l => l.ReturnedAt != null);
-        }
-
         var totalCount = await query.CountAsync();
 
         var pagedLoans = await query
@@ -53,6 +44,35 @@ public class EfLoanRepository : EfRepository<Loan>, ILoanRepository
             .ToListAsync();
 
         return new PagedResult<Loan>
+        {
+            Items = pagedLoans,
+            TotalCount = totalCount
+        };
+    }
+
+    public async Task<PagedResult<ArchivedLoan>> GetArchivedLoansAsync(LoanQueryParameters queryParameters)
+    {
+        var query = _context.ArchivedLoans.AsQueryable();
+
+        if (queryParameters.UserId.HasValue)
+        {
+            query = query.Where(l => l.UserId == queryParameters.UserId.Value);
+        }
+
+        if (queryParameters.BookId.HasValue)
+        {
+            query = query.Where(l => l.BookId == queryParameters.BookId.Value);
+        }
+
+        var totalCount = await query.CountAsync();
+
+        var pagedLoans = await query
+            .OrderByDescending(l => l.ReturnedAt)
+            .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
+            .Take(queryParameters.PageSize)
+            .ToListAsync();
+
+        return new PagedResult<ArchivedLoan>
         {
             Items = pagedLoans,
             TotalCount = totalCount
