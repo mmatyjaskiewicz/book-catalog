@@ -38,4 +38,11 @@ public class LoanController(LoanService loanService) : ControllerBase
         var loans = await loanService.GetActiveLoansAsync(queryParameters);
         return Ok(loans);
     }
+    
+    [HttpGet("archived")]
+    public async Task<ActionResult> GetArchived([FromQuery] LoanQueryParameters queryParameters)
+    {
+        var loans = await loanService.GetArchivedLoansAsync(queryParameters);
+        return Ok(loans);
+    }
 }
