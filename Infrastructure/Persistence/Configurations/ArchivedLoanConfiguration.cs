@@ -4,17 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Persistence.Configurations;
 
-public class LoanConfiguration : IEntityTypeConfiguration<Loan>
+public class ArchivedLoanConfiguration : IEntityTypeConfiguration<ArchivedLoan>
 {
-    public void Configure(EntityTypeBuilder<Loan> builder)
+    public void Configure(EntityTypeBuilder<ArchivedLoan> builder)
     {
-        builder.ToTable("loans");
+        builder.ToTable("archived_loans");
 
         builder.HasKey(l => l.Id);
-
-        builder.HasIndex(l => l.BookId)
-            .HasDatabaseName("ix_loans_book_id_active")
-            .IsUnique();
 
         builder.Property(l => l.Id)
             .HasColumnName("id");
@@ -31,13 +27,17 @@ public class LoanConfiguration : IEntityTypeConfiguration<Loan>
             .HasColumnName("borrowed_at")
             .IsRequired();
 
+        builder.Property(l => l.ReturnedAt)
+            .HasColumnName("returned_at")
+            .IsRequired();
+
         builder.HasOne(l => l.Book)
             .WithMany()
             .HasForeignKey(l => l.BookId)
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(l => l.User)
-            .WithMany(u => u.Loans)
+            .WithMany()
             .HasForeignKey(l => l.UserId)
             .OnDelete(DeleteBehavior.Restrict);
     }

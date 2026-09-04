@@ -16,4 +16,5 @@ public class BookCatalogDbContext(DbContextOptions<BookCatalogDbContext> options
     public DbSet<Author> Authors => Set<Author>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Loan> Loans => Set<Loan>();
+    public DbSet<ArchivedLoan> ArchivedLoans => Set<ArchivedLoan>();
 }
