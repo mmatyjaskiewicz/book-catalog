@@ -73,3 +73,73 @@ I adjusted the validation rules so that fields are validated only when they are 
 The changes from this week were developed through separate feature branches and merged into `development` before being promoted to `main`.
 
 The project now has initial unit test coverage for the application service and validators, providing a foundation for adding more tests as the project grows.
+
+# Week 3
+
+## What I built
+
+Reworked the persistence layer and extended the application with support for authors, users and book loans.
+
+The previous in-memory storage was replaced with Entity Framework Core and PostgreSQL, allowing data to persist between application restarts.
+
+I introduced EF Core entity configurations and migrations so that the database schema can be created and updated in a controlled way.
+
+The domain model was extended with `Author`, `User` and `Loan` entities, together with the required relationships between books, authors, users and loans.
+
+The lending functionality now supports borrowing books, returning them, retrieving active loans and retrieving loan history.
+
+I separated active loans from returned loans by introducing `ArchivedLoan`. Active loans are stored in `loans`, while completed loans are moved to `archived_loans`.
+
+The repository layer was refactored to use a generic `IRepository<T>` abstraction for common CRUD operations, while entity-specific repositories continue to contain custom query logic.
+
+Database-side filtering and pagination use `IQueryable`, `CountAsync`, `Skip` and `Take`, so the database performs the filtering and pagination instead of loading unnecessary records into memory.
+
+I also added protection against two users borrowing the same book at the same time using a unique database constraint.
+
+PostgreSQL constraint violations are translated into an application-level concurrency exception and returned to the client as HTTP 409 Conflict.
+
+Returning a book now removes the active loan and creates an archived loan as part of a single `SaveChangesAsync()` operation.
+
+I added Docker support for both the WebApi and PostgreSQL, allowing the application and database to be started together using Docker Compose.
+
+Configuration such as the database connection is provided through environment variables, keeping environment-specific settings outside the application code.
+
+I also expanded Swagger response documentation for the new endpoints and their possible HTTP responses.
+
+Finally, I extended the unit test coverage for the application services and validators to cover the new functionality and additional edge cases.
+
+## Key decisions
+
+I chose PostgreSQL with Entity Framework Core as the persistent storage solution because the application now requires relational data, foreign keys and database-level constraints.
+
+I kept the application dependent on repository abstractions rather than directly depending on Entity Framework Core, allowing the application layer to remain independent from the persistence implementation.
+
+I introduced a generic repository for operations shared between entities, while keeping filtering, pagination and other entity-specific queries in dedicated repositories.
+
+For active loans, I used a unique index on `BookId` so that the database itself guarantees that a book cannot have multiple active loans.
+
+I decided to keep returned loans in a separate `archived_loans` table instead of keeping both active and completed loans in the same table. This keeps the active loan table focused on the current state while preserving the complete lending history separately.
+
+For returning a book, both database changes are saved through one `SaveChangesAsync()` call. This allows EF Core to handle the operation transactionally without introducing an additional Unit of Work abstraction.
+
+For pagination and filtering, I kept the operations database-side to avoid loading records that are not required by the requested page.
+
+Docker was added so that the application can be run together with a PostgreSQL instance using the same Compose configuration instead of requiring the database to be installed and configured manually.
+
+I also kept the unit tests independent from PostgreSQL. The application services can therefore still be tested using mocks without requiring a running database.
+
+## What was difficult
+
+The most difficult part of this week was the refactoring caused by introducing the new domain entities and relationships.
+
+At the beginning of the project, I did not yet have a complete understanding of all of the requirements and the full scope of the final data model. Because of that, the initial implementation was built around a much simpler `Book` model.
+
+When the complete requirements became clear, I had to rethink part of the existing architecture instead of simply adding a few new endpoints.
+
+Introducing `Author`, `User`, `Loan` and later `ArchivedLoan` affected several layers of the application.
+
+I was initially surprised by how much of the existing code had to be refactored to support the new requirements. It showed me how changes to the domain model can have a significant impact on the rest of the application, even when the existing architecture is already separated into layers.
+
+I also had to investigate how to handle concurrent borrowing correctly. A simple application-level check was not enough because two requests could pass the check at the same time. The final solution moved this guarantee to the database through a unique constraint and mapped the resulting PostgreSQL exception to a proper application-level conflict response.
+
+Overall, this week required much more refactoring than the previous stages, but it also gave me a better understanding of how domain changes affect the overall architecture.

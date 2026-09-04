@@ -5,10 +5,19 @@ REST API for managing a book catalog, built with ASP.NET Core.
 ## Features
 
 - Create, read, update and delete books
+- Author management
+- User management
+- Book borrowing and returning
+- Active loan and loan history endpoints
+- Filtering and pagination
 - Request validation with FluentValidation
 - Global exception handling
+- PostgreSQL persistence with Entity Framework Core
+- Database migrations
+- Concurrency protection for active book loans
 - Swagger / OpenAPI
-- In-memory data storage
+- Unit tests with xUnit and Moq
+- Docker support with Docker Compose
 
 ## Structure
 
@@ -16,8 +25,9 @@ The project is divided into:
 
 - **Domain** – entities and domain rules
 - **Application** – business logic, DTOs and abstractions
-- **Infrastructure** – repository implementation
+- **Infrastructure** – database configuration, EF Core and repository implementations
 - **WebApi** – controllers and API configuration
+- **UnitTests** – unit tests for services and validators
 
 ## Documentation
 
