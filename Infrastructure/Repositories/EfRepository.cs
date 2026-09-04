@@ -33,12 +33,7 @@ public class EfRepository<T>(BookCatalogDbContext context) : IRepository<T> wher
         context.Set<T>().Remove(entity);
         return context.SaveChangesAsync();
     }
-
-    public Task<List<T>> GetAllAsync()
-    {
-        return context.Set<T>().ToListAsync();
-    }
-
+    
     public Task<T?> GetByIdAsync(Guid id)
     {
         return context.Set<T>().FindAsync(id).AsTask();

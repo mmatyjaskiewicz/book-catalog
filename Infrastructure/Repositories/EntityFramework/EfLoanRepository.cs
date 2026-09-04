@@ -35,14 +35,19 @@ public class EfLoanRepository : EfRepository<Loan>, ILoanRepository
             query = query.Where(l => l.BookId == queryParameters.BookId.Value);
         }
 
-        if (queryParameters.ActiveOnly.HasValue)
+        if (queryParameters.ActiveOnly == true)
         {
-            query = query.Where(l => l.ReturnedAt == null == queryParameters.ActiveOnly.Value);
+            query = query.Where(l => l.ReturnedAt == null);
         }
-        
+        else if (queryParameters.ActiveOnly == false)
+        {
+            query = query.Where(l => l.ReturnedAt != null);
+        }
+
         var totalCount = await query.CountAsync();
 
         var pagedLoans = await query
+            .OrderByDescending(l => l.BorrowedAt)
             .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
             .Take(queryParameters.PageSize)
             .ToListAsync();

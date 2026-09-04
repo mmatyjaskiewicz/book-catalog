@@ -9,6 +9,6 @@ public class CreateAuthorRequestValidator : AbstractValidator<CreateAuthorReques
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.");
+            .MaximumLength(100).WithMessage("Name must not exceed 200 characters.");
     }
 }
