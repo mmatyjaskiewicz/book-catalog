@@ -35,7 +35,7 @@ public class LoanController(LoanService loanService) : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetAll([FromQuery] LoanQueryParameters queryParameters)
     {
-        var loans = await loanService.GetAllAsync(queryParameters);
+        var loans = await loanService.GetActiveLoansAsync(queryParameters);
         return Ok(loans);
     }
 }

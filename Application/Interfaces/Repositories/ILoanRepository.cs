@@ -6,6 +6,8 @@ namespace Application.Interfaces.Repositories;
 
 public interface ILoanRepository : IRepository<Loan>
 {
-    Task<Loan?> GetActiveLoanByBookIdAsync(Guid bookId);
-    Task<PagedResult<Loan>> GetAllAsync(LoanQueryParameters queryParameters);
+    public Task<Loan?> GetActiveLoanByBookIdAsync(Guid bookId);
+    public Task<PagedResult<Loan>> GetActiveLoansAsync(LoanQueryParameters queryParameters);
+    public Task<PagedResult<ArchivedLoan>> GetArchivedLoansAsync(LoanQueryParameters queryParameters);
+    public Task ArchiveLoanAsync(Loan loan);
 }
