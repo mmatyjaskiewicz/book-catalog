@@ -7,5 +7,4 @@ public class LoanQueryParameters
     
     public Guid? UserId { get; set; }
     public Guid? BookId { get; set; }
-    public bool? ActiveOnly { get; set; }
 }

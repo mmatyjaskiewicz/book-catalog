@@ -8,7 +8,7 @@ public class Book : EntityBase
     public int PublishYear { get; private set; }
     
     public Guid AuthorId { get; private set; }
-    public Author Author { get; set; }
+    public Author Author { get; set; } = null!;
     
     public Book(string title, Guid authorId, int publishYear)
     {
@@ -43,8 +43,8 @@ public class Book : EntityBase
         if (string.IsNullOrWhiteSpace(title))
             throw new DomainException("Title is required.");
 
-        if (title.Length > 200)
-            throw new DomainException("Title cannot exceed 200 characters.");
+        if (title.Length > 100)
+            throw new DomainException("Title cannot exceed 100 characters.");
     }
     
     private static void ValidatePublishYear(int publishYear)

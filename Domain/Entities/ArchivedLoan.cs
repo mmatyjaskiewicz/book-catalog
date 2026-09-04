@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities;
 
-public class Loan : EntityBase
+public class ArchivedLoan : EntityBase
 {
     public Guid BookId { get; private set; }
     public Book Book { get; set; } = null!;
@@ -9,11 +9,13 @@ public class Loan : EntityBase
     public User User { get; set; } = null!;
     
     public DateTime BorrowedAt { get; private set; }
-    
-    public Loan(Guid bookId, Guid userId)
+    public DateTime ReturnedAt { get; private set; }
+
+    public ArchivedLoan(Guid bookId, Guid userId, DateTime borrowedAt, DateTime returnedAt)
     {
         BookId = bookId;
         UserId = userId;
-        BorrowedAt = DateTime.UtcNow;
+        BorrowedAt = borrowedAt;
+        ReturnedAt = returnedAt;
     }
 }

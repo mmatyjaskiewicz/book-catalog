@@ -28,6 +28,7 @@ public class EfAuthorRepository : EfRepository<Author>, IAuthorRepository
         var totalCount = await query.CountAsync();
 
         var pagedAuthors = await query
+            .OrderBy(a => a.Name)
             .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
             .Take(queryParameters.PageSize)
             .ToListAsync();

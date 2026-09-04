@@ -9,7 +9,7 @@ public class UpdateAuthorRequestValidator : AbstractValidator<UpdateAuthorReques
     {
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Name is required.")
-            .MaximumLength(200).WithMessage("Name must not exceed 200 characters.")
+            .MaximumLength(100).WithMessage("Name must not exceed 100 characters.")
             .When(x => x.Name != null);
     }
 }

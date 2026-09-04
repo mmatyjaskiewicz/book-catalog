@@ -38,6 +38,7 @@ public class EfBookRepository : EfRepository<Book>, IBookRepository
         var totalCount = await query.CountAsync();
 
         var pagedBooks = await query
+            .OrderBy(b => b.Title)
             .Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize)
             .Take(queryParameters.PageSize)
             .ToListAsync();
