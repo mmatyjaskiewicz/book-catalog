@@ -10,6 +10,10 @@ namespace WebApi.Controllers;
 public class LoanController(LoanService loanService) : ControllerBase
 {
     [HttpPost("borrow")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Borrow([FromBody] CreateLoanRequest request)
     {
         await loanService.BorrowAsync(request);
@@ -18,6 +22,8 @@ public class LoanController(LoanService loanService) : ControllerBase
     }
 
     [HttpPatch("return/{loanId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Return([FromRoute] Guid loanId)
     {
         await loanService.ReturnAsync(loanId);
@@ -26,6 +32,8 @@ public class LoanController(LoanService loanService) : ControllerBase
     }
     
     [HttpGet("{loanId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> GetById(Guid loanId)
     {
         var loan = await loanService.GetByIdAsync(loanId);
@@ -33,6 +41,9 @@ public class LoanController(LoanService loanService) : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> GetAll([FromQuery] LoanQueryParameters queryParameters)
     {
         var loans = await loanService.GetActiveLoansAsync(queryParameters);
@@ -40,6 +51,9 @@ public class LoanController(LoanService loanService) : ControllerBase
     }
     
     [HttpGet("archived")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> GetArchived([FromQuery] LoanQueryParameters queryParameters)
     {
         var loans = await loanService.GetArchivedLoansAsync(queryParameters);
