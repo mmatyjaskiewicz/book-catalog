@@ -4,15 +4,15 @@ using FluentValidation.TestHelper;
 
 namespace UnitTests.Validators;
 
-public class BookQueryParametersValidatorTests
+public class AuthorQueryParametersValidatorTests
 {
     [Fact]
     public void ShouldBeValid_WhenParametersAreCorrect()
     {
         // Arrange
-        var validator = new BookQueryParametersValidator();
+        var validator = new AuthorQueryParametersValidator();
 
-        var queryParameters = new BookQueryParameters
+        var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 1,
             PageSize = 10
@@ -26,31 +26,12 @@ public class BookQueryParametersValidatorTests
     }
 
     [Fact]
-    public void ShouldBeValid_WhenPageNumberIsAtMinimum()
-    {
-        // Arrange
-        var validator = new BookQueryParametersValidator();
-
-        var queryParameters = new BookQueryParameters
-        {
-            PageNumber = 1,
-            PageSize = 10
-        };
-
-        // Act
-        var result = validator.TestValidate(queryParameters);
-
-        // Assert
-        result.ShouldNotHaveValidationErrorFor(x => x.PageNumber);
-    }
-
-    [Fact]
     public void ShouldHaveError_WhenPageNumberIsBelowMinimum()
     {
         // Arrange
-        var validator = new BookQueryParametersValidator();
+        var validator = new AuthorQueryParametersValidator();
 
-        var queryParameters = new BookQueryParameters
+        var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 0,
             PageSize = 10
@@ -67,9 +48,9 @@ public class BookQueryParametersValidatorTests
     public void ShouldHaveError_WhenPageSizeIsBelowMinimum()
     {
         // Arrange
-        var validator = new BookQueryParametersValidator();
+        var validator = new AuthorQueryParametersValidator();
 
-        var queryParameters = new BookQueryParameters
+        var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 1,
             PageSize = 0
@@ -86,9 +67,9 @@ public class BookQueryParametersValidatorTests
     public void ShouldHaveError_WhenPageSizeIsAboveMaximum()
     {
         // Arrange
-        var validator = new BookQueryParametersValidator();
+        var validator = new AuthorQueryParametersValidator();
 
-        var queryParameters = new BookQueryParameters
+        var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 1,
             PageSize = 101
@@ -102,12 +83,12 @@ public class BookQueryParametersValidatorTests
     }
 
     [Fact]
-    public void ShouldBeValid_WhenPageSizeIsAtBoundaryValues()
+    public void ShouldBeValid_WhenPageSizeIsAtMaximum()
     {
         // Arrange
-        var validator = new BookQueryParametersValidator();
+        var validator = new AuthorQueryParametersValidator();
 
-        var queryParameters = new BookQueryParameters
+        var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 1,
             PageSize = 100
