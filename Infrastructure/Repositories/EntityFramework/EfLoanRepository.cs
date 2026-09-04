@@ -78,4 +78,15 @@ public class EfLoanRepository : EfRepository<Loan>, ILoanRepository
             TotalCount = totalCount
         };
     }
+    
+    // TODO: Consider what to do with this in the future
+    public async Task ArchiveLoanAsync(Loan loan)
+    {
+        var archivedLoan = new ArchivedLoan(loan.BookId, loan.UserId, loan.BorrowedAt, DateTime.UtcNow);
+
+        _context.Loans.Remove(loan);
+        _context.ArchivedLoans.Add(archivedLoan);
+
+        await _context.SaveChangesAsync();
+    }
 }

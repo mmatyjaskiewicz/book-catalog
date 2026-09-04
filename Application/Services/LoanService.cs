@@ -43,13 +43,7 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
             throw new NotFoundException("Loan not found.");
         }
         
-        if (loan.ReturnedAt != null)
-        {
-            throw new ConflictException("Book has already been returned.");
-        }
-        
-        loan.Return();
-        await loanRepository.UpdateAsync(loan);
+        await loanRepository.ArchiveLoanAsync(loan);
     }
     
     public async Task<Loan> GetByIdAsync(Guid loanId)
@@ -63,13 +57,13 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
         return loan;
     }
 
-    public async Task<PagedResult<Loan>> GetAllAsync(LoanQueryParameters queryParameters)
+    public async Task<PagedResult<Loan>> GetActiveLoansAsync(LoanQueryParameters queryParameters)
     {
-        var result = await loanRepository.GetAllAsync(queryParameters);
+        var result = await loanRepository.GetActiveLoansAsync(queryParameters);
 
         if (result.Items.Count == 0)
         {
-            throw new NotFoundException("No loans found.");
+            throw new NotFoundException("No active loans found.");
         }
 
         var totalPages = (int)Math.Ceiling((double)result.TotalCount / queryParameters.PageSize);
@@ -78,7 +72,26 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
         {
             throw new BadRequestException($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
         }
-        
+    
+        return result;
+    }
+    
+    public async Task<PagedResult<ArchivedLoan>> GetArchivedLoansAsync(LoanQueryParameters queryParameters)
+    {
+        var result = await loanRepository.GetArchivedLoansAsync(queryParameters);
+
+        if (result.Items.Count == 0)
+        {
+            throw new NotFoundException("No archived loans found.");
+        }
+
+        var totalPages = (int)Math.Ceiling((double)result.TotalCount / queryParameters.PageSize);
+
+        if (queryParameters.PageNumber > totalPages)
+        {
+            throw new BadRequestException($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
+        }
+
         return result;
     }
 }
