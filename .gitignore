@@ -85,3 +85,9 @@ coverage/
 
 .docker/
 docker-compose.override.yml
+
+##################################################
+# KUBERNETES
+##################################################
+
+k8s/secret.yaml
