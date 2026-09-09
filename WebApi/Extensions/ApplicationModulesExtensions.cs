@@ -10,6 +10,7 @@ public static class ApplicationModulesExtensions
         services.AddValidation();
         services.AddExceptionHandling();
         services.AddSwagger();
+        services.AddHealthChecksConfiguration();
         
         return services;
     }

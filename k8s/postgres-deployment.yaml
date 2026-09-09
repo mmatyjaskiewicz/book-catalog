@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: bookcatalog-postgres
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: bookcatalog-postgres
+    template:
+        metadata:
+            labels:
+                app: bookcatalog-postgres
+        spec:
+            containers:
+                - name: postgres
+                  image: postgres:17
+                  ports:
+                      - containerPort: 5432
+                  env:
+                      - name: POSTGRES_DB
+                        value: bookcatalog
+                      - name: POSTGRES_USER
+                        value: bookcatalog
+                      - name: POSTGRES_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: bookcatalog-secret
+                                key: POSTGRES_PASSWORD
+                  volumeMounts:
+                      - name: postgres-storage
+                        mountPath: /var/lib/postgresql/data
+
+            volumes:
+                - name: postgres-storage
+                  persistentVolumeClaim:
+                      claimName: bookcatalog-postgres-pvc

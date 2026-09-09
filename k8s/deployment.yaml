@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: book-catalog-webapi
+spec:
+    replicas: 3
+    selector:
+        matchLabels:
+            app: book-catalog-webapi
+    template:
+        metadata:
+            labels:
+                app: book-catalog-webapi
+        spec:
+            containers:
+                - name: book-catalog-webapi
+                  image: book-catalog-webapi:latest
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                      - containerPort: 8080
+
+                  livenessProbe:
+                      httpGet:
+                          path: /health/live
+                          port: 8080
+                      initialDelaySeconds: 10
+                      periodSeconds: 10
+                      timeoutSeconds: 2
+                      failureThreshold: 3
+
+                  readinessProbe:
+                      httpGet:
+                          path: /health/ready
+                          port: 8080
+                      initialDelaySeconds: 5
+                      periodSeconds: 5
+                      timeoutSeconds: 2
+                      failureThreshold: 3
+
+                  resources:
+                      requests:
+                          cpu: 100m
+                          memory: 128Mi
+                      limits:
+                          cpu: 500m
+                          memory: 256Mi
+
+                  env:
+                      - name: ASPNETCORE_ENVIRONMENT
+                        value: Development
+                      - name: ConnectionStrings__DefaultConnection
+                        valueFrom:
+                            secretKeyRef:
+                                name: bookcatalog-secret
+                                key: ConnectionStrings__DefaultConnection
