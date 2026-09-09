@@ -1,3 +1,4 @@
+using Infrastructure.Persistence;
 using WebApi.Extensions;
 
 namespace WebApi;
@@ -11,6 +12,9 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         
         builder.Services.AddApplicationModules(builder.Configuration);
+        builder.Services
+            .AddHealthChecks()
+            .AddDbContextCheck<BookCatalogDbContext>();
         
         var app = builder.Build();
         
@@ -24,6 +28,8 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
+        
+        app.MapHealthChecks("/health");
         
         app.UseSwagger();
         
