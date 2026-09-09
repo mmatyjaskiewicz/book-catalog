@@ -1,4 +1,6 @@
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using WebApi.Extensions;
 
 namespace WebApi;
@@ -14,7 +16,8 @@ public class Program
         builder.Services.AddApplicationModules(builder.Configuration);
         builder.Services
             .AddHealthChecks()
-            .AddDbContextCheck<BookCatalogDbContext>();
+            .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" })
+            .AddDbContextCheck<BookCatalogDbContext>(tags: new[] { "ready" });
         
         var app = builder.Build();
         
@@ -29,7 +32,15 @@ public class Program
 
         app.UseAuthorization();
         
-        app.MapHealthChecks("/health");
+        app.MapHealthChecks("/health/live", new HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("live")
+        });
+        
+        app.MapHealthChecks("/health/ready", new HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("ready")
+        });
         
         app.UseSwagger();
         
