@@ -143,3 +143,35 @@ I was initially surprised by how much of the existing code had to be refactored 
 I also had to investigate how to handle concurrent borrowing correctly. A simple application-level check was not enough because two requests could pass the check at the same time. The final solution moved this guarantee to the database through a unique constraint and mapped the resulting PostgreSQL exception to a proper application-level conflict response.
 
 Overall, this week required much more refactoring than the previous stages, but it also gave me a better understanding of how domain changes affect the overall architecture.
+
+# Week 4
+
+## What I built
+
+Prepared the application for deployment with Kubernetes.
+
+I created Kubernetes configuration for the WebApi and PostgreSQL, including Deployments, Services, a PersistentVolumeClaim and a Secret for database configuration.
+
+I added liveness and readiness probes to the WebApi. The liveness probe checks whether the application itself is running, while the readiness probe checks whether the application can connect to PostgreSQL.
+
+I also configured CPU and memory requests and limits for the WebApi containers.
+
+The Kubernetes setup was tested locally using Docker Desktop Kubernetes. I verified that the WebApi could communicate with PostgreSQL through the Kubernetes Service and that the database could be accessed correctly after applying the EF Core migrations.
+
+I tested running multiple WebApi replicas and verified that Kubernetes could manage the replicas correctly.
+
+I also practiced deployment rollback and basic Kubernetes troubleshooting using Pod status, Services, Endpoints, logs and resource descriptions.
+
+Finally, I reorganized the health check registration into a dedicated extension while keeping the HTTP endpoint mapping in Program.cs.
+
+## Key decisions
+
+I decided to use Kubernetes Secrets for database configuration and a PersistentVolumeClaim for PostgreSQL storage.
+
+I also kept the health check registration in application extensions while leaving endpoint mapping in Program.cs.
+
+## What was difficult
+
+This was my first practical experience with Kubernetes, so the entire setup was a new challenge for me.
+
+The main learning experience was understanding how Kubernetes works as a separate, isolated environment and how the different components of the application need to be configured to work together within it.

@@ -18,6 +18,7 @@ REST API for managing a book catalog, built with ASP.NET Core.
 - Swagger / OpenAPI
 - Unit tests with xUnit and Moq
 - Docker support with Docker Compose
+- Kubernetes deployment configuration
 
 ## Structure
 
@@ -29,13 +30,51 @@ The project is divided into:
 - **WebApi** – controllers and API configuration
 - **UnitTests** – unit tests for services and validators
 
-## Documentation
+## Documentation & Project History
+
+The project was initially developed on GitLab and later migrated to GitHub. Further development continues on GitHub.
 
 More details can be found in:
 
 - [`DESIGN_NOTE.md`](DESIGN_NOTE.md) – development notes and design decisions
 - [`MERGE_REQUEST_HISTORY.md`](MERGE_REQUEST_HISTORY.md) – initial GitLab Merge Request history
 
-## Project History
+## Running locally
 
-The project was initially developed on GitLab and later migrated to GitHub. Further development continues on GitHub.
+### Requirements
+
+- Git
+- Docker Desktop with Docker Compose
+
+### Docker Compose
+
+Clone the repository:
+
+```bash
+git clone https://github.com/mmatyjaskiewicz/book-catalog.git
+cd book-catalog
+```
+
+Build and start the application:
+
+```bash
+docker compose up --build
+```
+
+The API will be available at:
+
+```text
+http://localhost:8080
+```
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger
+```
+
+To stop the application:
+
+```bash
+docker compose down
+```
