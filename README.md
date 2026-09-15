@@ -81,11 +81,15 @@ Docker Compose will start the API and PostgreSQL database. Database migrations a
 
 The API will be available at:
 
+```text
 http://localhost:5001
+```
 
 Swagger UI:
 
+```text
 http://localhost:5001/swagger
+```
 
 To stop the application:
 
