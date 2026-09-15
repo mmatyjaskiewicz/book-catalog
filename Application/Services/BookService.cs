@@ -9,10 +9,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class BookService(IBookRepository bookRepository, ILogger<BookService> logger)
+public class BookService(IBookRepository bookRepository, IAuthorRepository authorRepository, ILogger<BookService> logger)
 {
     public async Task<Book> CreateAsync(CreateBookRequest request)
     {
+        var author = await authorRepository.GetByIdAsync(request.AuthorId);
+        
+        if(author == null)
+        {
+            logger.LogWarning("Author {AuthorId} was not found.", request.AuthorId);
+            throw new NotFoundException("Author not found.");
+        }
+        
         var book = new Book(request.Title, request.AuthorId, request.PublishYear);
         
         await bookRepository.AddAsync(book);
