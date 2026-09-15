@@ -15,7 +15,6 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     public async Task<Book> CreateAsync(CreateBookRequest request)
     {
         var author = await authorRepository.GetByIdAsync(request.AuthorId);
-        
         if(author == null)
         {
             logger.LogWarning("Author {AuthorId} was not found.", request.AuthorId);
@@ -33,7 +32,6 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
         var result = await bookRepository.GetAllAsync(queryParameters);
-        
         if (result.Items.Count == 0)
         {
             logger.LogWarning("No books were found.");
@@ -54,7 +52,6 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     public async Task<Book?> GetByIdAsync(Guid id)
     {
         var book = await bookRepository.GetByIdAsync(id);
-        
         if (book == null)
         {
             logger.LogWarning("Book {BookId} was not found.", id);
@@ -67,7 +64,6 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
     public async Task DeleteAsync(Guid id)
     {
         var book = await bookRepository.GetByIdAsync(id);
-        
         if (book == null)
         {
             logger.LogWarning("Book {BookId} was not found.", id);
@@ -75,7 +71,6 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
         }
         
         var activeLoan = await loanRepository.GetActiveLoanByBookIdAsync(id);
-        
         if (activeLoan != null)
         {
             logger.LogWarning("Book {BookId} is currently on loan and cannot be deleted.", id);
@@ -94,7 +89,6 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
         }
         
         var book = await bookRepository.GetByIdAsync(id);
-        
         if (book == null)
         {
             logger.LogWarning("Book {BookId} was not found.", id);
