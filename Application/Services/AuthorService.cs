@@ -25,7 +25,6 @@ public class AuthorService(IAuthorRepository authorRepository, ILogger<AuthorSer
     public async Task<PagedResult<Author>> GetAllAsync(AuthorQueryParameters queryParameters)
     {
         var result = await authorRepository.GetAllAsync(queryParameters);
-
         if (result.Items.Count == 0)
         {
             logger.LogWarning("No authors were found.");
@@ -47,7 +46,6 @@ public class AuthorService(IAuthorRepository authorRepository, ILogger<AuthorSer
     public async Task<Author?> GetByIdAsync(Guid id)
     {
         var author = await authorRepository.GetByIdAsync(id);
-
         if (author == null)
         {
             logger.LogWarning("Author {AuthorId} was not found.", id);
@@ -65,7 +63,6 @@ public class AuthorService(IAuthorRepository authorRepository, ILogger<AuthorSer
         }
 
         var author = await authorRepository.GetByIdAsync(id);
-
         if (author == null)
         {
             logger.LogWarning("Author {AuthorId} was not found.", id);

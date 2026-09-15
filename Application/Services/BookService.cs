@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Queries;
 using Application.DTOs.Requests;
 using Application.Exceptions.BadRequest;
+using Application.Exceptions.Conflict;
 using Application.Exceptions.NotFound;
 using Application.Interfaces.Repositories;
 using Application.Models;
@@ -9,10 +10,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class BookService(IBookRepository bookRepository, ILogger<BookService> logger)
+public class BookService(IBookRepository bookRepository, IAuthorRepository authorRepository, ILoanRepository loanRepository, ILogger<BookService> logger)
 {
     public async Task<Book> CreateAsync(CreateBookRequest request)
     {
+        var author = await authorRepository.GetByIdAsync(request.AuthorId);
+        if(author == null)
+        {
+            logger.LogWarning("Author {AuthorId} was not found.", request.AuthorId);
+            throw new NotFoundException("Author not found.");
+        }
+        
         var book = new Book(request.Title, request.AuthorId, request.PublishYear);
         
         await bookRepository.AddAsync(book);
@@ -24,7 +32,6 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
     public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
     {
         var result = await bookRepository.GetAllAsync(queryParameters);
-        
         if (result.Items.Count == 0)
         {
             logger.LogWarning("No books were found.");
@@ -45,7 +52,6 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
     public async Task<Book?> GetByIdAsync(Guid id)
     {
         var book = await bookRepository.GetByIdAsync(id);
-        
         if (book == null)
         {
             logger.LogWarning("Book {BookId} was not found.", id);
@@ -58,11 +64,17 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
     public async Task DeleteAsync(Guid id)
     {
         var book = await bookRepository.GetByIdAsync(id);
-        
         if (book == null)
         {
             logger.LogWarning("Book {BookId} was not found.", id);
             throw new NotFoundException("Book not found.");
+        }
+        
+        var activeLoan = await loanRepository.GetActiveLoanByBookIdAsync(id);
+        if (activeLoan != null)
+        {
+            logger.LogWarning("Book {BookId} is currently on loan and cannot be deleted.", id);
+            throw new ConflictException("Book is currently on loan and cannot be deleted.");
         }
         
         await bookRepository.DeleteAsync(book);
@@ -77,7 +89,6 @@ public class BookService(IBookRepository bookRepository, ILogger<BookService> lo
         }
         
         var book = await bookRepository.GetByIdAsync(id);
-        
         if (book == null)
         {
             logger.LogWarning("Book {BookId} was not found.", id);

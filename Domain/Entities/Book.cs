@@ -41,21 +41,29 @@ public class Book : EntityBase
     private static void ValidateTitle(string title)
     {
         if (string.IsNullOrWhiteSpace(title))
+        {
             throw new DomainException("Title is required.");
+        }
 
         if (title.Length > 100)
+        {
             throw new DomainException("Title cannot exceed 100 characters.");
+        }
     }
     
     private static void ValidatePublishYear(int publishYear)
     {
         if (publishYear < 1 || publishYear > DateTime.UtcNow.Year)
+        {
             throw new DomainException("Invalid publication year.");
+        }
     }
     
     public static void ValidateAuthorId(Guid authorId)
     {
         if (authorId == Guid.Empty)
+        {
             throw new DomainException("AuthorId is required.");
+        }
     }
 }

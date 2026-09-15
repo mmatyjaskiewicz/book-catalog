@@ -60,7 +60,6 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
     public async Task<PagedResult<Loan>> GetActiveLoansAsync(LoanQueryParameters queryParameters)
     {
         var result = await loanRepository.GetActiveLoansAsync(queryParameters);
-
         if (result.Items.Count == 0)
         {
             throw new NotFoundException("No active loans found.");
@@ -79,7 +78,6 @@ public class LoanService(ILoanRepository loanRepository, IBookRepository bookRep
     public async Task<PagedResult<ArchivedLoan>> GetArchivedLoansAsync(LoanQueryParameters queryParameters)
     {
         var result = await loanRepository.GetArchivedLoansAsync(queryParameters);
-
         if (result.Items.Count == 0)
         {
             throw new NotFoundException("No archived loans found.");
