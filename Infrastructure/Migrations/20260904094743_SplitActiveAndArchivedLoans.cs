@@ -11,14 +11,6 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "ix_loans_book_id_active",
-                table: "loans");
-
-            migrationBuilder.DropColumn(
-                name: "returned_at",
-                table: "loans");
-
             migrationBuilder.CreateTable(
                 name: "archived_loans",
                 columns: table => new
@@ -46,6 +38,37 @@ namespace Infrastructure.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.Sql("""
+                INSERT INTO archived_loans (
+                    id,
+                    book_id,
+                    user_id,
+                    borrowed_at,
+                    returned_at
+                )
+                SELECT
+                    id,
+                    book_id,
+                    user_id,
+                    borrowed_at,
+                    returned_at
+                FROM loans
+                WHERE returned_at IS NOT NULL;
+                """);
+
+            migrationBuilder.Sql("""
+                DELETE FROM loans
+                WHERE returned_at IS NOT NULL;
+                """);
+
+            migrationBuilder.DropIndex(
+                name: "ix_loans_book_id_active",
+                table: "loans");
+
+            migrationBuilder.DropColumn(
+                name: "returned_at",
+                table: "loans");
+
             migrationBuilder.CreateIndex(
                 name: "ix_loans_book_id_active",
                 table: "loans",
@@ -66,9 +89,6 @@ namespace Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "archived_loans");
-
             migrationBuilder.DropIndex(
                 name: "ix_loans_book_id_active",
                 table: "loans");
@@ -78,6 +98,26 @@ namespace Infrastructure.Migrations
                 table: "loans",
                 type: "timestamp with time zone",
                 nullable: true);
+
+            migrationBuilder.Sql("""
+                INSERT INTO loans (
+                    id,
+                    book_id,
+                    user_id,
+                    borrowed_at,
+                    returned_at
+                )
+                SELECT
+                    id,
+                    book_id,
+                    user_id,
+                    borrowed_at,
+                    returned_at
+                FROM archived_loans;
+                """);
+
+            migrationBuilder.DropTable(
+                name: "archived_loans");
 
             migrationBuilder.CreateIndex(
                 name: "ix_loans_book_id_active",
