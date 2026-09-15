@@ -55,23 +55,37 @@ git clone https://github.com/mmatyjaskiewicz/book-catalog.git
 cd book-catalog
 ```
 
+Create your local `.env` file based on the provided example:
+
+Linux / macOS - Bash:
+
+```bash
+cp .env.example .env
+```
+
+On Windows PowerShell:
+
+```bash
+Copy-Item .env.example .env
+```
+
+The `.env.example` file contains example values for the PostgreSQL database configuration. You can modify these values in `.env` if needed.
+
 Build and start the application:
 
 ```bash
 docker compose up --build
 ```
 
+Docker Compose will start the API and PostgreSQL database. Database migrations and initial seed data are applied automatically when the API starts.
+
 The API will be available at:
 
-```text
-http://localhost:8080
-```
+http://localhost:5001
 
 Swagger UI:
 
-```text
-http://localhost:8080/swagger
-```
+http://localhost:5001/swagger
 
 To stop the application:
 
