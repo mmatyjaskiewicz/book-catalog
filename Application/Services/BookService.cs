@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Queries;
 using Application.DTOs.Requests;
 using Application.Exceptions.BadRequest;
+using Application.Exceptions.Conflict;
 using Application.Exceptions.NotFound;
 using Application.Interfaces.Repositories;
 using Application.Models;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
-public class BookService(IBookRepository bookRepository, IAuthorRepository authorRepository, ILogger<BookService> logger)
+public class BookService(IBookRepository bookRepository, IAuthorRepository authorRepository, ILoanRepository loanRepository, ILogger<BookService> logger)
 {
     public async Task<Book> CreateAsync(CreateBookRequest request)
     {
@@ -71,6 +72,14 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
         {
             logger.LogWarning("Book {BookId} was not found.", id);
             throw new NotFoundException("Book not found.");
+        }
+        
+        var activeLoan = await loanRepository.GetActiveLoanByBookIdAsync(id);
+        
+        if (activeLoan != null)
+        {
+            logger.LogWarning("Book {BookId} is currently on loan and cannot be deleted.", id);
+            throw new ConflictException("Book is currently on loan and cannot be deleted.");
         }
         
         await bookRepository.DeleteAsync(book);
