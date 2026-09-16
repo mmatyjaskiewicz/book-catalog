@@ -1,4 +1,3 @@
-using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using WebApi.Extensions;
 
@@ -8,6 +7,11 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            DotNetEnv.Env.TraversePath().Load();
+        }
+        
         var builder = WebApplication.CreateBuilder(args);
         
         builder.Services.AddApplicationModules(builder.Configuration);
@@ -38,7 +42,6 @@ public class Program
         //     var dbContext = scope.ServiceProvider.GetRequiredService<BookCatalogDbContext>();
         //     await DatabaseInitializer.SeedAsync(dbContext);
         // }
-
         
         app.MapOpenApi();
         
