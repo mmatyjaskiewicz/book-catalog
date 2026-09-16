@@ -8,24 +8,39 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
-        DotNetEnv.Env.TraversePath().Load();
-        
         var builder = WebApplication.CreateBuilder(args);
         
         builder.Services.AddApplicationModules(builder.Configuration);
         
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        
+        try
+        {
+            var connectionStringBuilder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString);
+
+            Console.WriteLine(
+                $"PostgreSQL config OK: Host={connectionStringBuilder.Host}, " +
+                $"Port={connectionStringBuilder.Port}, " +
+                $"Database={connectionStringBuilder.Database}, " +
+                $"Username={connectionStringBuilder.Username}, " +
+                $"SslMode={connectionStringBuilder.SslMode}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"PostgreSQL connection string ERROR: {ex.GetType().Name}: {ex.Message}");
+        }
+        
         var app = builder.Build();
         
-        await using (var scope = app.Services.CreateAsyncScope())
-        {
-            var dbContext = scope.ServiceProvider.GetRequiredService<BookCatalogDbContext>();
-            await DatabaseInitializer.InitializeAsync(dbContext);
-        }
+        // await using (var scope = app.Services.CreateAsyncScope())
+        // {
+        //     var dbContext = scope.ServiceProvider.GetRequiredService<BookCatalogDbContext>();
+        //     await DatabaseInitializer.SeedAsync(dbContext);
+        // }
+
         
-        if (app.Environment.IsDevelopment())
-        {
-            app.MapOpenApi();
-        }
+        app.MapOpenApi();
         
         app.UseExceptionHandler();
         

@@ -11,7 +11,7 @@ public static class DatabaseInitializer
         await SeedAsync(context);
     }
     
-    private static async Task SeedAsync(BookCatalogDbContext dbContext)
+    public static async Task SeedAsync(BookCatalogDbContext dbContext)
     {
         if (await dbContext.Authors.AnyAsync())
         {
