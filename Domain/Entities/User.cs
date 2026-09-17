@@ -10,4 +10,9 @@ public class User : EntityBase
     {
         Username = username;
     }
+    
+    public void Update(string username)
+    {
+        Username = username;
+    }
 }
