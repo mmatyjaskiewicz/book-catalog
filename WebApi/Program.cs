@@ -1,3 +1,4 @@
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using WebApi.Extensions;
 
@@ -37,11 +38,14 @@ public class Program
         
         var app = builder.Build();
         
-        // await using (var scope = app.Services.CreateAsyncScope())
-        // {
-        //     var dbContext = scope.ServiceProvider.GetRequiredService<BookCatalogDbContext>();
-        //     await DatabaseInitializer.SeedAsync(dbContext);
-        // }
+        if(app.Environment.IsDevelopment())
+        {
+            await using (var scope = app.Services.CreateAsyncScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<BookCatalogDbContext>();
+                await DatabaseInitializer.InitializeAsync(dbContext);
+            }
+        }
         
         app.MapOpenApi();
         
