@@ -1,4 +1,6 @@
-﻿using Application.Interfaces.Repositories;
+﻿using Application.DTOs.Requests;
+using Application.Exceptions.NotFound;
+using Application.Interfaces.Repositories;
 using Domain.Entities;
 
 namespace Application.Services;
@@ -11,9 +13,16 @@ public class UserService(IUserRepository userRepository)
         await userRepository.AddAsync(user);
     }
     
-    public Task UpdateUserAsync(User user)
+    public async Task UpdateUserAsync(UpdateUserRequest request)
     {
-        return userRepository.UpdateAsync(user);
+        var user = await userRepository.GetByIdAsync(request.Id);
+        if (user is null)
+        {
+            throw new NotFoundException("User not found");
+        }
+        
+        user.Update(request.Username);
+        await userRepository.UpdateAsync(user);
     }
     
     public Task DeleteUserAsync(User user)

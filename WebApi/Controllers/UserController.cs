@@ -1,5 +1,5 @@
-﻿using Application.Services;
-using Domain.Entities;
+﻿using Application.DTOs.Requests;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers;
@@ -29,9 +29,9 @@ public class UserController(UserService userService) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateUser([FromBody] User user)
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request)
     {
-        await userService.UpdateUserAsync(user);
+        await userService.UpdateUserAsync(request);
         return NoContent();
     }
 
