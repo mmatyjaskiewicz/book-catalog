@@ -28,7 +28,7 @@ jobs:
               run: az acr login --name bookcatalogacr2026
 
             - name: Build Docker image
-              run: docker build -f WebApi/Dockerfile -t bookcatalogacr2026-hmakfwc5gdcvawd.azurecr.io/bookcatalog-api:${{ github.sha }} .
+              run: docker build -f WebApi/Dockerfile -t bookcatalogacr2026-hmakfwc5gdcvawd7.azurecr.io/bookcatalog-api:${{ github.sha }} .
 
             - name: Push Docker image
-              run: docker push bookcatalogacr2026-hmakfwc5gdcvawd.azurecr.io/bookcatalog-api:${{ github.sha }}
+              run: docker push bookcatalogacr2026-hmakfwc5gdcvawd7.azurecr.io/bookcatalog-api:${{ github.sha }}
