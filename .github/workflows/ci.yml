@@ -7,7 +7,7 @@ on:
             - main
 
 jobs:
-    build-and-test:
+    build:
         runs-on: ubuntu-latest
 
         steps:
@@ -23,4 +23,4 @@ jobs:
               run: dotnet restore BookCatalog.sln
 
             - name: Build
-              run: dotnet build BookCatalog.sln --no-restore --configuration Release
+              run: dotnet build WebApi/WebApi.csproj --no-restore --configuration Release
