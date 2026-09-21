@@ -22,7 +22,7 @@ public class EfBookRepository : EfRepository<Book>, IBookRepository
 
         if (!string.IsNullOrWhiteSpace(queryParameters.Title))
         {
-            query = query.Where(b => b.Title.Contains(queryParameters.Title));
+            query = query.Where(book => EF.Functions.ILike(book.Title, $"%{queryParameters.Title}%"));
         }
         
         if (queryParameters.AuthorId.HasValue)
