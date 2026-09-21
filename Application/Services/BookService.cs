@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Queries;
 using Application.DTOs.Requests;
+using Application.DTOs.Responses;
 using Application.Exceptions.BadRequest;
 using Application.Exceptions.Conflict;
 using Application.Exceptions.NotFound;
@@ -29,24 +30,43 @@ public class BookService(IBookRepository bookRepository, IAuthorRepository autho
         return book;
     }
     
-    public async Task<PagedResult<Book>> GetAllAsync(BookQueryParameters queryParameters)
+    public async Task<PagedResult<BookResponse>> GetAllAsync(BookQueryParameters queryParameters)
     {
         var result = await bookRepository.GetAllAsync(queryParameters);
+
         if (result.Items.Count == 0)
         {
             logger.LogWarning("No books were found.");
             throw new NotFoundException("No books found.");
         }
-        
+
         var totalPages = (int)Math.Ceiling((double)result.TotalCount / queryParameters.PageSize);
-        
-        if(queryParameters.PageNumber > totalPages)
+
+        if (queryParameters.PageNumber > totalPages)
         {
             logger.LogWarning("Page {PageNumber} is out of range. Total pages: {TotalPages}.", queryParameters.PageNumber, totalPages);
+
             throw new BadRequestException($"Page number {queryParameters.PageNumber} is out of range. Total pages: {totalPages}.");
         }
-        
-        return result;
+
+        var responseItems = new List<BookResponse>();
+
+        foreach (var book in result.Items)
+        {
+            responseItems.Add(new BookResponse
+            {
+                Id = book.Id,
+                Title = book.Title,
+                PublishYear = book.PublishYear,
+                AuthorId = book.AuthorId
+            });
+        }
+
+        return new PagedResult<BookResponse>
+        {
+            Items = responseItems,
+            TotalCount = result.TotalCount
+        };
     }
     
     public async Task<Book?> GetByIdAsync(Guid id)
