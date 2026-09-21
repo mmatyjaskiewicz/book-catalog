@@ -47,7 +47,7 @@ spec:
 
                   env:
                       - name: ASPNETCORE_ENVIRONMENT
-                        value: Development
+                        value: Production
                       - name: ConnectionStrings__DefaultConnection
                         valueFrom:
                             secretKeyRef:
