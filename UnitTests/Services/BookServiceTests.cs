@@ -13,14 +13,21 @@ namespace UnitTests.Services;
 
 public class BookServiceTests
 {
+    private readonly Mock<IBookRepository> _bookRepositoryMock = new();
+    private readonly Mock<IAuthorRepository> _authorRepositoryMock = new();
+    private readonly Mock<ILoanRepository> _loanRepositoryMock = new();
+    private readonly Mock<ILogger<BookService>> _loggerMock = new();
+
+    private BookService CreateService()
+    {
+        return new BookService(_bookRepositoryMock.Object, _authorRepositoryMock.Object, _loanRepositoryMock.Object, _loggerMock.Object);
+    }
+
     // Tests for GetAllAsync method in BookService
     [Fact]
     public async Task GetAllAsync_ShouldReturnBooks_WhenBooksExist()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var queryParameters = new BookQueryParameters
         {
             PageNumber = 1,
@@ -35,26 +42,31 @@ public class BookServiceTests
             TotalCount = 1
         };
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetAllAsync(queryParameters))
             .ReturnsAsync(pagedResult);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act
         var result = await bookService.GetAllAsync(queryParameters);
 
         // Assert
-        Assert.Equal(pagedResult, result);
+        Assert.Single(result.Items);
+        Assert.Equal(1, result.TotalCount);
+
+        var returnedBook = result.Items[0];
+
+        Assert.Equal(book.Id, returnedBook.Id);
+        Assert.Equal(book.Title, returnedBook.Title);
+        Assert.Equal(book.PublishYear, returnedBook.PublishYear);
+        Assert.Equal(book.AuthorId, returnedBook.AuthorId);
     }
 
     [Fact]
     public async Task GetAllAsync_ShouldThrowNotFoundException_WhenNoBooksFound()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var queryParameters = new BookQueryParameters
         {
             PageNumber = 1,
@@ -67,11 +79,11 @@ public class BookServiceTests
             TotalCount = 0
         };
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetAllAsync(queryParameters))
             .ReturnsAsync(pagedResult);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => bookService.GetAllAsync(queryParameters));
@@ -81,9 +93,6 @@ public class BookServiceTests
     public async Task GetAllAsync_ShouldThrowBadRequestException_WhenPageNumberIsOutOfRange()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var queryParameters = new BookQueryParameters
         {
             PageNumber = 4,
@@ -96,11 +105,11 @@ public class BookServiceTests
             TotalCount = 25
         };
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetAllAsync(queryParameters))
             .ReturnsAsync(pagedResult);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<BadRequestException>(() => bookService.GetAllAsync(queryParameters));
@@ -111,16 +120,13 @@ public class BookServiceTests
     public async Task GetByIdAsync_ShouldReturnBook_WhenBookExists()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var book = new Book("Mock title", Guid.NewGuid(), 2024);
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetByIdAsync(book.Id))
             .ReturnsAsync(book);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act
         var result = await bookService.GetByIdAsync(book.Id);
@@ -133,16 +139,13 @@ public class BookServiceTests
     public async Task GetByIdAsync_ShouldThrowNotFoundException_WhenBookDoesNotExist()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var fakeBookId = Guid.NewGuid();
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetByIdAsync(fakeBookId))
-            .ReturnsAsync((Book)null!);
+            .ReturnsAsync((Book?)null);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => bookService.GetByIdAsync(fakeBookId));
@@ -153,22 +156,27 @@ public class BookServiceTests
     public async Task CreateAsync_ShouldCallRepositoryCreate_WhenCalled()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
+        var authorId = Guid.NewGuid();
+        var author = new Author("Mock author");
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        _authorRepositoryMock
+            .Setup(x => x.GetByIdAsync(authorId))
+            .ReturnsAsync(author);
 
         var request = new CreateBookRequest
         {
             Title = "Mock title",
-            AuthorId = Guid.NewGuid(),
+            AuthorId = authorId,
             PublishYear = 2024
         };
 
+        var bookService = CreateService();
+
+        // Act
         await bookService.CreateAsync(request);
 
         // Assert
-        repositoryMock.Verify(
+        _bookRepositoryMock.Verify(
             x => x.AddAsync(It.Is<Book>(book =>
                 book.Title == request.Title &&
                 book.AuthorId == request.AuthorId &&
@@ -180,17 +188,21 @@ public class BookServiceTests
     public async Task CreateAsync_ShouldReturnCreatedBook_WhenCalled()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
+        var authorId = Guid.NewGuid();
+        var author = new Author("Mock author");
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        _authorRepositoryMock
+            .Setup(x => x.GetByIdAsync(authorId))
+            .ReturnsAsync(author);
 
         var request = new CreateBookRequest
         {
             Title = "Mock title",
-            AuthorId = Guid.NewGuid(),
+            AuthorId = authorId,
             PublishYear = 2024
         };
+
+        var bookService = CreateService();
 
         // Act
         var result = await bookService.CreateAsync(request);
@@ -206,43 +218,42 @@ public class BookServiceTests
     public async Task DeleteAsync_ShouldDeleteBook_WhenBookExists()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var book = new Book("Mock title", Guid.NewGuid(), 2024);
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetByIdAsync(book.Id))
             .ReturnsAsync(book);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        _loanRepositoryMock
+            .Setup(x => x.GetActiveLoanByBookIdAsync(book.Id))
+            .ReturnsAsync((Loan?)null);
+
+        var bookService = CreateService();
 
         // Act
         await bookService.DeleteAsync(book.Id);
 
         // Assert
-        repositoryMock.Verify(x => x.DeleteAsync(book), Times.Once);
+        _bookRepositoryMock.Verify(x => x.DeleteAsync(book), Times.Once);
     }
 
     [Fact]
     public async Task DeleteAsync_ShouldThrowNotFoundException_WhenBookDoesNotExist()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var bookId = Guid.NewGuid();
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetByIdAsync(bookId))
-            .ReturnsAsync((Book)null!);
+            .ReturnsAsync((Book?)null);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act & Assert
-        await Assert.ThrowsAsync<NotFoundException>(() => bookService.DeleteAsync(bookId));
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => bookService.DeleteAsync(bookId));
 
-        repositoryMock.Verify(x => x.DeleteAsync(It.IsAny<Book>()), Times.Never);
+        _bookRepositoryMock.Verify(x => x.DeleteAsync(It.IsAny<Book>()), Times.Never);
     }
 
     // Tests for UpdateAsync method in BookService
@@ -250,9 +261,6 @@ public class BookServiceTests
     public async Task UpdateAsync_ShouldUpdateBook_WhenBookExists()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var book = new Book("Old title", Guid.NewGuid(), 2000);
         var authorId = Guid.NewGuid();
 
@@ -263,11 +271,11 @@ public class BookServiceTests
             PublishYear = 2020
         };
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetByIdAsync(book.Id))
             .ReturnsAsync(book);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act
         var result = await bookService.UpdateAsync(book.Id, request);
@@ -277,16 +285,13 @@ public class BookServiceTests
         Assert.Equal(authorId, result.AuthorId);
         Assert.Equal(2020, result.PublishYear);
 
-        repositoryMock.Verify(x => x.UpdateAsync(book), Times.Once);
+        _bookRepositoryMock.Verify(x => x.UpdateAsync(book), Times.Once);
     }
 
     [Fact]
     public async Task UpdateAsync_ShouldUpdateOnlyProvidedFields()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var originalAuthorId = Guid.NewGuid();
         var book = new Book("Old title", originalAuthorId, 2000);
 
@@ -295,11 +300,11 @@ public class BookServiceTests
             Title = "New title"
         };
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetByIdAsync(book.Id))
             .ReturnsAsync(book);
 
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
+        var bookService = CreateService();
 
         // Act
         var result = await bookService.UpdateAsync(book.Id, request);
@@ -309,34 +314,29 @@ public class BookServiceTests
         Assert.Equal(originalAuthorId, result.AuthorId);
         Assert.Equal(2000, result.PublishYear);
 
-        repositoryMock.Verify(x => x.UpdateAsync(book), Times.Once);
+        _bookRepositoryMock.Verify(x => x.UpdateAsync(book), Times.Once);
     }
 
     [Fact]
     public async Task UpdateAsync_ShouldThrowBadRequestException_WhenNoFieldsAreProvided()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
-        var bookService = new BookService(repositoryMock.Object, loggerMock.Object);
-
         var request = new UpdateBookRequest();
+        var bookService = CreateService();
 
         // Act & Assert
-        await Assert.ThrowsAsync<BadRequestException>(() => bookService.UpdateAsync(Guid.NewGuid(), request));
+        await Assert.ThrowsAsync<BadRequestException>(
+            () => bookService.UpdateAsync(Guid.NewGuid(), request));
 
-        repositoryMock.Verify(x => x.GetByIdAsync(It.IsAny<Guid>()), Times.Never);
-        repositoryMock.Verify(x => x.UpdateAsync(It.IsAny<Book>()), Times.Never);
+        _bookRepositoryMock.Verify(x => x.GetByIdAsync(It.IsAny<Guid>()), Times.Never);
+
+        _bookRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<Book>()), Times.Never);
     }
 
     [Fact]
     public async Task UpdateAsync_ShouldThrowNotFoundException_WhenBookDoesNotExist()
     {
         // Arrange
-        var repositoryMock = new Mock<IBookRepository>();
-        var loggerMock = new Mock<ILogger<BookService>>();
-
         var bookId = Guid.NewGuid();
 
         var request = new UpdateBookRequest
@@ -346,13 +346,11 @@ public class BookServiceTests
             PublishYear = 2020
         };
 
-        repositoryMock
+        _bookRepositoryMock
             .Setup(x => x.GetByIdAsync(bookId))
-            .ReturnsAsync((Book)null!);
+            .ReturnsAsync((Book?)null);
 
-        var bookService = new BookService(
-            repositoryMock.Object,
-            loggerMock.Object);
+        var bookService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => bookService.UpdateAsync(bookId, request));

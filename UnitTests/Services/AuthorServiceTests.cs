@@ -13,15 +13,20 @@ namespace UnitTests.Services;
 
 public class AuthorServiceTests
 {
+    private readonly Mock<IAuthorRepository> _authorRepositoryMock = new();
+    private readonly Mock<ILogger<AuthorService>> _loggerMock = new();
+
+    private AuthorService CreateService()
+    {
+        return new AuthorService(_authorRepositoryMock.Object, _loggerMock.Object);
+    }
+
     // Tests for CreateAsync method in AuthorService
     [Fact]
     public async Task CreateAsync_ShouldReturnCreatedAuthor_WhenCalled()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         var request = new CreateAuthorRequest
         {
@@ -34,7 +39,7 @@ public class AuthorServiceTests
         // Assert
         Assert.Equal(request.Name, result.Name);
 
-        repositoryMock.Verify(
+        _authorRepositoryMock.Verify(
             x => x.AddAsync(It.Is<Author>(author =>
                 author.Name == request.Name)),
             Times.Once);
@@ -45,9 +50,6 @@ public class AuthorServiceTests
     public async Task GetAllAsync_ShouldReturnAuthors_WhenAuthorsExist()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
         var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 1,
@@ -62,11 +64,11 @@ public class AuthorServiceTests
             TotalCount = 1
         };
 
-        repositoryMock
+        _authorRepositoryMock
             .Setup(x => x.GetAllAsync(queryParameters))
             .ReturnsAsync(pagedResult);
 
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         // Act
         var result = await authorService.GetAllAsync(queryParameters);
@@ -79,9 +81,6 @@ public class AuthorServiceTests
     public async Task GetAllAsync_ShouldThrowNotFoundException_WhenNoAuthorsFound()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
         var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 1,
@@ -94,11 +93,11 @@ public class AuthorServiceTests
             TotalCount = 0
         };
 
-        repositoryMock
+        _authorRepositoryMock
             .Setup(x => x.GetAllAsync(queryParameters))
             .ReturnsAsync(pagedResult);
 
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => authorService.GetAllAsync(queryParameters));
@@ -108,9 +107,6 @@ public class AuthorServiceTests
     public async Task GetAllAsync_ShouldThrowBadRequestException_WhenPageNumberIsOutOfRange()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
         var queryParameters = new AuthorQueryParameters
         {
             PageNumber = 4,
@@ -123,11 +119,11 @@ public class AuthorServiceTests
             TotalCount = 25
         };
 
-        repositoryMock
+        _authorRepositoryMock
             .Setup(x => x.GetAllAsync(queryParameters))
             .ReturnsAsync(pagedResult);
 
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<BadRequestException>(() => authorService.GetAllAsync(queryParameters));
@@ -138,16 +134,13 @@ public class AuthorServiceTests
     public async Task GetByIdAsync_ShouldReturnAuthor_WhenAuthorExists()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
         var author = new Author("Mock author");
 
-        repositoryMock
+        _authorRepositoryMock
             .Setup(x => x.GetByIdAsync(author.Id))
             .ReturnsAsync(author);
 
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         // Act
         var result = await authorService.GetByIdAsync(author.Id);
@@ -160,16 +153,13 @@ public class AuthorServiceTests
     public async Task GetByIdAsync_ShouldThrowNotFoundException_WhenAuthorDoesNotExist()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
         var authorId = Guid.NewGuid();
 
-        repositoryMock
+        _authorRepositoryMock
             .Setup(x => x.GetByIdAsync(authorId))
             .ReturnsAsync((Author)null!);
 
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => authorService.GetByIdAsync(authorId));
@@ -180,9 +170,6 @@ public class AuthorServiceTests
     public async Task UpdateAsync_ShouldUpdateAuthor_WhenAuthorExists()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
         var author = new Author("Old author");
 
         var request = new UpdateAuthorRequest
@@ -190,11 +177,11 @@ public class AuthorServiceTests
             Name = "New author"
         };
 
-        repositoryMock
+        _authorRepositoryMock
             .Setup(x => x.GetByIdAsync(author.Id))
             .ReturnsAsync(author);
 
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         // Act
         var result = await authorService.UpdateAsync(author.Id, request);
@@ -202,34 +189,30 @@ public class AuthorServiceTests
         // Assert
         Assert.Equal("New author", result.Name);
 
-        repositoryMock.Verify(x => x.UpdateAsync(author), Times.Once);
+        _authorRepositoryMock.Verify(x => x.UpdateAsync(author), Times.Once);
     }
 
     [Fact]
     public async Task UpdateAsync_ShouldThrowBadRequestException_WhenNameIsNotProvided()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         var request = new UpdateAuthorRequest();
 
         // Act & Assert
-        await Assert.ThrowsAsync<BadRequestException>(() => authorService.UpdateAsync(Guid.NewGuid(), request));
+        await Assert.ThrowsAsync<BadRequestException>(
+            () => authorService.UpdateAsync(Guid.NewGuid(), request));
 
-        repositoryMock.Verify(x => x.GetByIdAsync(It.IsAny<Guid>()), Times.Never);
-        repositoryMock.Verify(x => x.UpdateAsync(It.IsAny<Author>()), Times.Never);
+        _authorRepositoryMock.Verify(x => x.GetByIdAsync(It.IsAny<Guid>()), Times.Never);
+
+        _authorRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<Author>()), Times.Never);
     }
 
     [Fact]
     public async Task UpdateAsync_ShouldThrowNotFoundException_WhenAuthorDoesNotExist()
     {
         // Arrange
-        var repositoryMock = new Mock<IAuthorRepository>();
-        var loggerMock = new Mock<ILogger<AuthorService>>();
-
         var authorId = Guid.NewGuid();
 
         var request = new UpdateAuthorRequest
@@ -237,11 +220,11 @@ public class AuthorServiceTests
             Name = "New author"
         };
 
-        repositoryMock
+        _authorRepositoryMock
             .Setup(x => x.GetByIdAsync(authorId))
             .ReturnsAsync((Author)null!);
 
-        var authorService = new AuthorService(repositoryMock.Object, loggerMock.Object);
+        var authorService = CreateService();
 
         // Act & Assert
         await Assert.ThrowsAsync<NotFoundException>(() => authorService.UpdateAsync(authorId, request));
