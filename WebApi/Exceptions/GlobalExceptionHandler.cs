@@ -2,6 +2,7 @@
 using Application.Exceptions.BadRequest;
 using Application.Exceptions.Conflict;
 using Application.Exceptions.NotFound;
+using Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace WebApi.Exceptions;
@@ -17,6 +18,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             BadRequestException => "Bad Request",
             NotFoundException => "Not Found",
             ConflictException => "Conflict",
+            DomainException => "Domain Error",
             _ => "Internal Server Error"
         };
         
@@ -25,6 +27,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
             BadRequestException => StatusCodes.Status400BadRequest,
             NotFoundException => StatusCodes.Status404NotFound,
             ConflictException => StatusCodes.Status409Conflict,
+            DomainException => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
         
