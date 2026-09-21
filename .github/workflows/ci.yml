@@ -24,3 +24,6 @@ jobs:
 
             - name: Build
               run: dotnet build WebApi/WebApi.csproj --no-restore --configuration Release
+
+            - name: Run unit tests
+              run: dotnet test UnitTests/UnitTests.csproj --no-restore --configuration Release
