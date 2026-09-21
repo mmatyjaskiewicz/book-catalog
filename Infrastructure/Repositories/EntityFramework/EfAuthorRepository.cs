@@ -22,7 +22,7 @@ public class EfAuthorRepository : EfRepository<Author>, IAuthorRepository
 
         if (!string.IsNullOrWhiteSpace(queryParameters.Name))
         {
-            query = query.Where(a => a.Name.Contains(queryParameters.Name));
+            query = query.Where(a => EF.Functions.ILike(a.Name, $"%{queryParameters.Name}%"));
         }
 
         var totalCount = await query.CountAsync();

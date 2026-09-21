@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Exceptions;
+
+namespace Domain.Entities;
 
 public class Author : EntityBase
 {
@@ -22,12 +24,12 @@ public class Author : EntityBase
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("Author name cannot be empty.");
+            throw new DomainException("Author name cannot be empty.");
         }
         
         if (name.Length > 100)
         {
-            throw new ArgumentException("Author name cannot exceed 100 characters.");
+            throw new DomainException("Author name cannot exceed 100 characters.");
         }
     }
 }
